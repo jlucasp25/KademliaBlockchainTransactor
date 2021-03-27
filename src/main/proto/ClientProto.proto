@@ -1,0 +1,15 @@
+syntax = "proto3";
+package pt.groupG.core;
+
+service ClientProto {
+  rpc join (EmptyMessage) returns (JoinMessage);
+}
+
+message JoinMessage {
+  string address = 1;
+  int32 port = 2;
+}
+
+message EmptyMessage {
+
+}
