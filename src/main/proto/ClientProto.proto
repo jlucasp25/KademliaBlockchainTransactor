@@ -1,8 +1,11 @@
 syntax = "proto3";
-package pt.groupG.core;
+package pt.groupG.communication;
+option java_multiple_files = true;
+option java_outer_classname = "ClientProto";
 
-service ClientProto {
+service Client {
   rpc join (EmptyMessage) returns (JoinMessage);
+  rpc ping (EmptyMessage) returns (BooleanMessage);
 }
 
 message JoinMessage {
@@ -10,6 +13,9 @@ message JoinMessage {
   int32 port = 2;
 }
 
-message EmptyMessage {
+message BooleanMessage {
+  bool value = 1;
+}
 
+message EmptyMessage {
 }

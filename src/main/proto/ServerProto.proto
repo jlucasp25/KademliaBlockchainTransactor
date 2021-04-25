@@ -1,0 +1,42 @@
+syntax = "proto3";
+package pt.groupG.communication;
+option java_multiple_files = true;
+option java_outer_classname = "ServerProto";
+
+service Server {
+  rpc join (EmptyMessage) returns (JoinMessage);
+  rpc ping (EmptyMessage) returns (BooleanMessage);
+  rpc findNode (NodeIdMessage) returns (NodeDetailsListMessage);
+  rpc findValue (NodeIdMessage) returns (NodeDetailsListMessage);
+}
+
+message JoinMessage {
+  string address = 1;
+  int32 port = 2;
+}
+
+message BooleanMessage {
+  bool value = 1;
+}
+
+message EmptyMessage {
+}
+
+message NodeDetailsMessage {
+  string address = 1;
+  int32 port = 2;
+  string nodeid = 3;
+}
+
+message NodeDetailsListMessage {
+  repeated NodeDetailsMessage nodes = 1;
+}
+
+message NodeIdMessage {
+  string nodeid = 1;
+}
+
+message NodeIdListMessage {
+  repeated NodeIdMessage nodes = 1;
+}
+
