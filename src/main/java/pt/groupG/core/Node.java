@@ -1,8 +1,5 @@
 package pt.groupG.core;
 
-import pt.groupG.communication.NodeDetailsListMessage;
-import pt.groupG.communication.NodeDetailsMessage;
-
 import java.util.LinkedList;
 
 public class Node {
@@ -43,7 +40,7 @@ public class Node {
     /**
      * Converts a Node into a Protobuf message.
      */
-    public static NodeDetailsMessage toMessageFormat(Node node) {
+  /*  public static NodeDetailsMessage toMessageFormat(Node node) {
         return NodeDetailsMessage
                 .newBuilder()
                 .setAddress(node.address)
@@ -51,17 +48,20 @@ public class Node {
                 .setNodeid(node.nodeID)
                 .build();
     }
-
+*/
     /**
      * Converts a Node Details Protobuf message into a Node.
      */
+/*
     public static Node fromMessageFormat(NodeDetailsMessage msg) {
         return new Node(msg.getNodeid(),msg.getAddress(),msg.getPort());
     }
+*/
 
     /**
      * Converts a Node Details List Protobuf message into a List of Nodes.
      */
+/*
     public static LinkedList<Node> fromMessageListFormat(NodeDetailsListMessage msg) {
         LinkedList<Node> l = new LinkedList<Node>();
         for (NodeDetailsMessage ndMsg : msg.getNodesList()) {
@@ -69,17 +69,19 @@ public class Node {
         }
         return l;
     }
+*/
 
     /**
      * Converts a list of Nodes into a Node Details List Protobuf message.
      */
-    public static NodeDetailsListMessage toMessageListFormat(LinkedList<Node> nodes) {
-        LinkedList<NodeDetailsMessage> l = new LinkedList<NodeDetailsMessage>();
-        for (Node aux : nodes) {
-            l.add(Node.toMessageFormat(aux));
-        }
-        return NodeDetailsListMessage.newBuilder().addAllNodes(l).build();
-    }
+//    public static NodeDetailsListMessage toMessageListFormat(LinkedList<Node> nodes) {
+//        LinkedList<NodeDetailsMessage> l = new LinkedList<NodeDetailsMessage>();
+//        for (Node aux : nodes) {
+//            l.add(Node.toMessageFormat(aux));
+//        }
+//        return NodeDetailsListMessage.newBuilder().addAllNodes(l).build();
+//    }
+
 
     @Override
     public String toString() {
