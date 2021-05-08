@@ -3,17 +3,10 @@ package pt.groupG.core;
 import java.util.LinkedList;
 
 public class Node {
-    private String nodeID;
+    private KademliaKey nodeID;
     private String address;
     private int port;
-
-    public String getNodeID() {
-        return nodeID;
-    }
-
-    public void setNodeID(String nodeID) {
-        this.nodeID = nodeID;
-    }
+    private KBucket bucket;
 
     public String getAddress() {
         return address;
@@ -31,11 +24,25 @@ public class Node {
         this.port = port;
     }
 
-    public Node(String nodeID, String address, int port) {
+    public Node(KademliaKey nodeID, String address, int port) {
         this.nodeID = nodeID;
         this.address = address;
         this.port = port;
     }
+
+    public void findNode(Node target) {
+
+    }
+
+    public int calculateDistance(Node aux) {
+        return 1;
+    }
+
+    public void addNodeToBucket(Node aux) {
+        this.bucket.addNode(aux);
+    }
+
+
 
     /**
      * Converts a Node into a Protobuf message.

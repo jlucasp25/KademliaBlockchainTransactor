@@ -3,15 +3,16 @@ package pt.groupG.core;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
-import pt.groupG.grpc.ServerServiceImpl;
+//import pt.groupG.grpc.ServerServiceImpl;
 
 import java.io.IOException;
 
 public class KademliaServer {
     private Server server;
     private final int SERVER_PORT = 8000;
+    public static int alpha = 3; // parallelism in network calls
 
-    public KademliaServer() throws IOException {
+/*    public KademliaServer() throws IOException {
        // this.init();
     }
 
@@ -23,6 +24,10 @@ public class KademliaServer {
                 .start();
 
     }
+
+    public void findNode() {
+
+    }*/
 
 }
 
