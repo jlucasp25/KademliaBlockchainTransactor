@@ -19,6 +19,7 @@ public class RPCClient {
 
     public boolean sendPING() {
         pt.groupG.grpc.EmptyMessage req = pt.groupG.grpc.EmptyMessage.newBuilder().build();
+        return true;
     }
 
 
