@@ -1,19 +1,42 @@
 package pt.groupG.core;
 
 
+import io.grpc.Channel;
+import pt.groupG.grpc.*;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class KademliaClient {
-    private final int SERVER_PORT = 8000;
-    public static int alpha = 3; // parallelism in network calls
-    private Node self;
+    private final ClientServiceGrpc.ClientServiceBlockingStub stub;
+    private Channel channel;
 
-
-    public void sendFindNode() {
-        // send findNode to server
+    KademliaClient(Channel channel) {
+        this.channel = channel;
+        stub = ClientServiceGrpc.newBlockingStub(channel);
     }
 
-    public void sendJoin() {
+    public BooleanMessage PING(EmptyMessage req) {
+        BooleanMessage res = null;
+        res = this.stub.ping(req);
+        return null;
     }
 
+    public List<Node> FIND_NODE(NodeIdMessage req) {
+        //List<Node> res = new LinkedList<Node>();
+        NodeDetailsListMessage res = null;
+        res = stub.findNode(req);
+        // convert details list into list of nodes.
+    }
+
+    public BooleanMessage STORE(NodeIdMessage req) {
+        BooleanMessage res = null;
+        res = stub.store(req);
+    }
+
+    public List<Node> FIND_VALUE(NodeIdMessage req) {
+        NodeDetailsListMessage res = null;
+        res = stub.findValue(req);
+    }
 
 }

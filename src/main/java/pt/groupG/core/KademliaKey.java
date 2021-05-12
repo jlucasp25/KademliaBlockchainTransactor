@@ -20,6 +20,14 @@ public class KademliaKey {
         this.key = key;
     }
 
+    public static KademliaKey generateMaxDistanceKey() {
+        byte[] keyArray = new byte[MAX_KEY_SIZE/8];
+        for (int i = 0; i < (MAX_KEY_SIZE/8) - 1 ; i++) {
+            keyArray[i] = (byte) 1;
+        }
+        return new KademliaKey(keyArray);
+    }
+
     /**
      * Calculates distance between 2 nodes.
      * @param aux
@@ -76,7 +84,7 @@ public class KademliaKey {
     public int calculateDistance(KademliaKey aux) {
         /*
         * new_key <- this XOR aux
-        * distance <- KEY_SIZE - new_key.first_on_bit
+        * distance <- KEY_SIZE - new_key.first_on_bit -> prefix
         * */
         return (MAX_KEY_SIZE - XOR(aux).getFirstBitOn());
     }

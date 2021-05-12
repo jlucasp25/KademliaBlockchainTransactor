@@ -14,26 +14,6 @@ public final class ServerProtos {
     registerAllExtensions(
         (com.google.protobuf.ExtensionRegistryLite) registry);
   }
-  static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_pt_groupG_grpc_NodeDetailsMessage_descriptor;
-  static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_pt_groupG_grpc_NodeDetailsMessage_fieldAccessorTable;
-  static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_pt_groupG_grpc_NodeDetailsListMessage_descriptor;
-  static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_pt_groupG_grpc_NodeDetailsListMessage_fieldAccessorTable;
-  static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_pt_groupG_grpc_NodeIdMessage_descriptor;
-  static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_pt_groupG_grpc_NodeIdMessage_fieldAccessorTable;
-  static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_pt_groupG_grpc_NodeIdListMessage_descriptor;
-  static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_pt_groupG_grpc_NodeIdListMessage_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -44,52 +24,22 @@ public final class ServerProtos {
   static {
     java.lang.String[] descriptorData = {
       "\n\021ServerProto.proto\022\016pt.groupG.grpc\032\021Cli" +
-      "entProto.proto\"C\n\022NodeDetailsMessage\022\017\n\007" +
-      "address\030\001 \001(\t\022\014\n\004port\030\002 \001(\005\022\016\n\006nodeid\030\003 " +
-      "\001(\t\"K\n\026NodeDetailsListMessage\0221\n\005nodes\030\001" +
-      " \003(\0132\".pt.groupG.grpc.NodeDetailsMessage" +
-      "\"\037\n\rNodeIdMessage\022\016\n\006nodeid\030\001 \001(\t\"A\n\021Nod" +
-      "eIdListMessage\022,\n\005nodes\030\001 \003(\0132\035.pt.group" +
-      "G.grpc.NodeIdMessage2\277\002\n\rServerService\022A" +
-      "\n\004join\022\034.pt.groupG.grpc.EmptyMessage\032\033.p" +
-      "t.groupG.grpc.JoinMessage\022D\n\004ping\022\034.pt.g" +
-      "roupG.grpc.EmptyMessage\032\036.pt.groupG.grpc" +
-      ".BooleanMessage\022Q\n\010findNode\022\035.pt.groupG." +
-      "grpc.NodeIdMessage\032&.pt.groupG.grpc.Node" +
-      "DetailsListMessage\022R\n\tfindValue\022\035.pt.gro" +
-      "upG.grpc.NodeIdMessage\032&.pt.groupG.grpc." +
-      "NodeDetailsListMessageB\020B\014ServerProtosP\001" +
-      "b\006proto3"
+      "entProto.proto2\277\002\n\rServerService\022A\n\004join" +
+      "\022\034.pt.groupG.grpc.EmptyMessage\032\033.pt.grou" +
+      "pG.grpc.JoinMessage\022D\n\004ping\022\034.pt.groupG." +
+      "grpc.EmptyMessage\032\036.pt.groupG.grpc.Boole" +
+      "anMessage\022Q\n\010findNode\022\035.pt.groupG.grpc.N" +
+      "odeIdMessage\032&.pt.groupG.grpc.NodeDetail" +
+      "sListMessage\022R\n\tfindValue\022\035.pt.groupG.gr" +
+      "pc.NodeIdMessage\032&.pt.groupG.grpc.NodeDe" +
+      "tailsListMessageB\020B\014ServerProtosP\001b\006prot" +
+      "o3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           pt.groupG.grpc.ClientProtos.getDescriptor(),
         });
-    internal_static_pt_groupG_grpc_NodeDetailsMessage_descriptor =
-      getDescriptor().getMessageTypes().get(0);
-    internal_static_pt_groupG_grpc_NodeDetailsMessage_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_pt_groupG_grpc_NodeDetailsMessage_descriptor,
-        new java.lang.String[] { "Address", "Port", "Nodeid", });
-    internal_static_pt_groupG_grpc_NodeDetailsListMessage_descriptor =
-      getDescriptor().getMessageTypes().get(1);
-    internal_static_pt_groupG_grpc_NodeDetailsListMessage_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_pt_groupG_grpc_NodeDetailsListMessage_descriptor,
-        new java.lang.String[] { "Nodes", });
-    internal_static_pt_groupG_grpc_NodeIdMessage_descriptor =
-      getDescriptor().getMessageTypes().get(2);
-    internal_static_pt_groupG_grpc_NodeIdMessage_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_pt_groupG_grpc_NodeIdMessage_descriptor,
-        new java.lang.String[] { "Nodeid", });
-    internal_static_pt_groupG_grpc_NodeIdListMessage_descriptor =
-      getDescriptor().getMessageTypes().get(3);
-    internal_static_pt_groupG_grpc_NodeIdListMessage_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_pt_groupG_grpc_NodeIdListMessage_descriptor,
-        new java.lang.String[] { "Nodes", });
     pt.groupG.grpc.ClientProtos.getDescriptor();
   }
 

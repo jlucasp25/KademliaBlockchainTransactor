@@ -1,9 +1,10 @@
 package pt.groupG.core;
 
+import java.util.Comparator;
 import java.util.LinkedList;
 
 public class Node {
-    private KademliaKey nodeID;
+    public KademliaKey nodeID;
     private String address;
     private int port;
     private KBucket bucket;
@@ -34,9 +35,6 @@ public class Node {
 
     }
 
-    public int calculateDistance(Node aux) {
-        return 1;
-    }
 
     public void addNodeToBucket(Node aux) {
         this.bucket.addNode(aux);
