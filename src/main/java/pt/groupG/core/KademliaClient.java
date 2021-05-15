@@ -22,10 +22,11 @@ public class KademliaClient {
         return null;
     }
 
-    public List<Node> FIND_NODE(NodeIdMessage req) {
+    public NodeDetailsListMessage FIND_NODE(NodeIdMessage req) {
         //List<Node> res = new LinkedList<Node>();
         NodeDetailsListMessage res = null;
         res = stub.findNode(req);
+        return res;
         // convert details list into list of nodes.
     }
 

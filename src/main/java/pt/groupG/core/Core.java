@@ -11,7 +11,6 @@ public class Core {
     private static String SELF_ADDRESS = "";
     private static String SERVER_PORT = "";
     private static String SELF_PORT = "";
-    private static NetworkClient client;
 
     public static String nodeId;
     public static List<Block> blockchain = new LinkedList<Block>();

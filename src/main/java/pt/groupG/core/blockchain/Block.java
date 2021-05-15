@@ -2,39 +2,51 @@ package pt.groupG.core.blockchain;
 
 import java.io.UnsupportedEncodingException;
 import java.security.*;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Block {
-        private String hash;
-        private String previousHash;
-        private String data;
+        public String hash;
+        public String previousHash;
+        public String merkleTree;
         private long timeStamp; //timestamp of the creation of this block
         private int nonce;
 
-        public Block(String data, String previousHash, long timeStamp) {
-            this.data = data;
+        public List<String> trans = new LinkedList<String>();
+
+        public Block(String previousHash, long timeStamp) {
             this.previousHash = previousHash;
             this.timeStamp = timeStamp;
             this.hash = calculateBlockHash();
         }
 
-        public String mineBlock(int prefix) {
-            String prefixString = new String(new char[prefix]).replace('\0', '0');
-            while (!hash.substring(0, prefix)
+        public Block (String hash, String previousHash, String merkelTree, List<String> trans, long timeStamp, int nonce) {
+            this.hash = hash;
+            this.previousHash = previousHash;
+            this.merkleTree = merkelTree;
+            this.trans = trans;
+            this.timeStamp = timeStamp;
+            this.nonce = nonce;
+        }
+
+        public void mineBlock(int dif) {
+            // merkleTree = getMerleRoot(ver funçao)
+            String prefixString = new String(new char[dif]).replace('\0', '0');
+            while (!hash.substring(0, dif)
                     .equals(prefixString)) {
                 nonce++;
                 hash = calculateBlockHash();
             }
-            return hash;
+            System.out.println("Block mined successfully:  " + hash);
         }
 
         public String calculateBlockHash() {
             String dataToHash = previousHash
                     + Long.toString(timeStamp)
                     + Integer.toString(nonce)
-                    + data; // concatenating different parts of the block to generate a hash from
+                    + merkleTree; // concatenating different parts of the block to generate a hash from
 
             MessageDigest digest = null;
             byte[] bytes = null;
@@ -54,15 +66,12 @@ public class Block {
             return buffer.toString();
         }
 
-        public String getHash() {
-            return this.hash;
-        }
-
-        public String getPreviousHash() {
-            return this.previousHash;
-        }
-
-        public void setData(String data) {
-            this.data = data;
+        public void addTransaction (String newtrans) {
+            //ver se a hash anterior corresponde
+            if(Blockchain.HashValidator()) {
+                trans.add(newtrans);
+                System.out.println("New Transaction added to Block.");
+            }
         }
     }
+

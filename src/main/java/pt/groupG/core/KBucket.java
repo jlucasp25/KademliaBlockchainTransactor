@@ -7,12 +7,21 @@ import java.util.List;
 public class KBucket {
     public static int MAX_CONTACTS = 20;
     public static int ALPHA_VALUE = 3;
-   public List<Node> contacts = new LinkedList<Node>();
+    public List<Node> contacts = new LinkedList<Node>();
     public KademliaKey key = new KademliaKey();
-    private int depth;
+    private int depth = 0;
 
     public KBucket(int depth) {
         this.depth = depth;
+    }
+
+    public KBucket(KademliaKey key, int depth) {
+        this.key = key;
+        this.depth = depth;
+    }
+
+    public KBucket(KademliaKey key) {
+        this.key = key;
     }
 
     public boolean isContactsEmpty() {

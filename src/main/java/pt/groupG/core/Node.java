@@ -1,5 +1,10 @@
 package pt.groupG.core;
 
+import com.google.protobuf.ByteString;
+import pt.groupG.grpc.NodeDetailsMessage;
+
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.LinkedList;
 
@@ -7,7 +12,7 @@ public class Node {
     public KademliaKey nodeID;
     private String address;
     private int port;
-    private KBucket bucket;
+    public KBucket bucket;
 
     public String getAddress() {
         return address;
@@ -40,7 +45,15 @@ public class Node {
         this.bucket.addNode(aux);
     }
 
-
+    /**
+     * Factory Constructor for Node using a NodeDetailsmessage object.
+     * @param msg
+     */
+    public static Node fromNodeDetailsMessage(NodeDetailsMessage msg) {
+        /*CASTS STRING TO BYTES[]; Maybe protobuf needs to be changed to bytes.*/
+        KademliaKey kdk = new KademliaKey(msg.getNodeid().getBytes(StandardCharsets.UTF_8));
+        return new Node(kdk, msg.getAddress(), msg.getPort());
+    }
 
     /**
      * Converts a Node into a Protobuf message.

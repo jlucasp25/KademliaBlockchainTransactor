@@ -89,4 +89,11 @@ public class KademliaKey {
         return (MAX_KEY_SIZE - XOR(aux).getFirstBitOn());
     }
 
+    public boolean equals(KademliaKey aux) {
+        for (int i = 0; i < this.key.length; i++) {
+            if (this.key[i] != aux.key[i])
+                return true;
+        }
+        return false;
+    }
 }

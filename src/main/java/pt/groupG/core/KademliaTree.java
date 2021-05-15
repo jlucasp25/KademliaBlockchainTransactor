@@ -1,11 +1,14 @@
 package pt.groupG.core;
 
+import com.google.protobuf.ByteString;
+import io.grpc.Channel;
+import io.grpc.ManagedChannelBuilder;
 import pt.groupG.core.blockchain.Blockchain;
+import pt.groupG.grpc.NodeDetailsListMessage;
+import pt.groupG.grpc.NodeDetailsMessage;
+import pt.groupG.grpc.NodeIdMessage;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public class KademliaTree {
     List<KBucket> buckets = new ArrayList<KBucket>();
@@ -13,6 +16,8 @@ public class KademliaTree {
     public static int ALPHA_VALUE = 3;
     Blockchain blockchain = null;
     Node currentNode = null;
+    KademliaClient client = null;
+    KademliaKey myKey = new KademliaKey();
 
     public List<Node> FIND_NODE(KademliaKey key) {
 
@@ -35,6 +40,7 @@ public class KademliaTree {
         /* closest contains closest non empty k bucket */
         List<Node> closestNodes = new ArrayList<Node>();
         List<Node> parentNodes = new ArrayList<Node>();
+        List<KademliaKey> keys = new LinkedList<KademliaKey>();
 
         if (closest != null) {
             Collections.sort(closest.contacts, new Comparator<Node>() {
@@ -54,74 +60,170 @@ public class KademliaTree {
             parentNodes.addAll(closest.contacts.subList(0, splitSize));
             closestNodes.addAll(closest.contacts.subList(0, splitSize));
 
-            for ( int i = 0; i < splitSize; i++) {
-                sendFIND_NODE(i, parentNodes, closestNodes);
+            for (int i = 0; i < splitSize; i++) {
+                sendFIND_NODE(i, lessDistance, parentNodes, closestNodes, keys);
             }
         }
     }
 
-    public void sendFIND_NODE(int i, List<Node> parentNodes, List<Node> closestNodes) {
-            // send alpha FIND NODES
-            Node nd = parentNodes.get(i);
-            //client = new P2PClient(ManagedChannelBuilder.forTarget(inode.ip + ":" + inode.port).usePlaintext().build());
-            Iterator<NodeInfo> round1 = client.FIND_NODE(inode.toNodeID(key).build());
-            listenKeys.add(inode.nodeID);
-            while ( round1 != null && round1.hasNext()) {
-                NodeInfo info = round1.next();
-                Node node = new Node(info.getNode());
-                inserts(node);
-                if (node.nodeID.compareTo(idistance) < 0) {
-                    idistance = node.nodeID;
-                    closest.add(node);
-                    if ((!ikbucket.inRange(iaddress) && BigInteger.valueOf(Integer.valueOf(closest.size())).compareTo(ikbucket.k) == 0) || (ikbucket.inRange(iaddress) && closest.size() == 10))
-                        return closest;
-                }
-                // round2 send findnode to k triples
-                System.out.println("round2(" + i + ") id:" + new BigInteger(1, node.nodeID.key) + " port: " + node.port);
-                client = new P2PClient(ManagedChannelBuilder.forTarget(node.ip + ":" + node.port).usePlaintext().build());
-                Iterator<NodeInfo> round2 = client.FIND_NODE(node.toNodeID(key).build());
-                listenKeys.add(node.nodeID);
-                int counter = 0;
-                while ( (round2 != null && round2.hasNext() && counter <= alpha)){
-                    NodeInfo info2 = round2.next();
-                    Node node2 = new Node(info2.getNode());
-                    inserts(node2);
-                    if (node2.nodeID.compareTo(idistance) < 0) {
-                        idistance = node2.nodeID;
-                        closest.add(node2);
-                        if ((!ikbucket.inRange(iaddress) && BigInteger.valueOf(Integer.valueOf(closest.size())).compareTo(ikbucket.k) == 0) || (ikbucket.inRange(iaddress) && closest.size() == 10))
-                            return closest;
-                    }
-                    for (int u=0; u<listenKeys.size(); u++){
-                        Key ikey = listenKeys.get(u);
-                        if (counter == alpha)
-                            break;
-                        if (node2.nodeID.compareTo(ikey) != 0) {
-                            System.out.println("round3(" + i + ") id:" + new BigInteger(1, node2.nodeID.key) + " port: " + node2.port);
-                            client = new P2PClient(ManagedChannelBuilder.forTarget(node2.ip + ":" + node2.port).usePlaintext().build());
-                            Iterator<NodeInfo> round3 = client.FIND_NODE(node2.toNodeID(key).build());
-                            counter++;
-                            while ( round3 != null && round3.hasNext()) {
-                                NodeInfo info3 = round3.next();
-                                Node node3 = new Node(info3.getNode());
-                                inserts(node3);
-                                if (node3.nodeID.compareTo(idistance) < 0) {
-                                    idistance = node3.nodeID;
-                                    closest.add(node3);
-                                    if ((!ikbucket.inRange(iaddress) && BigInteger.valueOf(Integer.valueOf(closest.size())).compareTo(ikbucket.k) == 0) || (ikbucket.inRange(iaddress) && closest.size() == 10))
-                                        return closest;
-                                }
-                            }
-                            break;
-                        }
-                    }
+    public void sendFIND_NODE(int i, int lessDistance, List<Node> parentNodes, List<Node> closestNodes, List<KademliaKey> keys) {
+        /////////////
+        // Round 1 //
+        /////////////
+
+        // gets i-th parent node.
+        Node nd = parentNodes.get(i);
+        // stores this key as watched.
+        keys.add(nd.nodeID);
+
+        //builds node address for endpoint, and channel for communication.
+        String nodeAddress = nd.getAddress() + ':' + nd.getPort();
+        Channel nodeChannel = ManagedChannelBuilder.forTarget(nodeAddress).usePlaintext().build();
+        this.client = new KademliaClient(nodeChannel);
+
+        // prepares FIND_NODE message
+        NodeIdMessage req = NodeIdMessage.newBuilder().setNodeidBytes(ByteString.copyFrom(nd.nodeID.getKey())).build();
+        // sends FIND_NODE Message
+        NodeDetailsListMessage res = this.client.FIND_NODE(req);
+        // retrieves list of NodeDetail.
+        List<NodeDetailsMessage> returnedNodes = res.getNodesList();
+
+        for (NodeDetailsMessage aux : returnedNodes) {
+            // creates Node from NdDetailsMessage using factory
+            Node ndAux = Node.fromNodeDetailsMessage(aux);
+            this.addToBucket(ndAux);
+            if (ndAux.nodeID.calculateDistance(myKey) < 0) {
+                // if distance between this node and me is less than 0 -->
+                closestNodes.add(ndAux);
+                //idistance = node.nodeId
+                //?
+                //if ((!ikbucket.inRange(iaddress) && BigInteger.valueOf(Integer.valueOf(closest.size())).compareTo(ikbucket.k) == 0) || (ikbucket.inRange(iaddress) && closest.size() == 10))
+                // if we got our result:
+                //    return closestNodes;
+            }
+
+            /////////////
+            // Round 2 //
+            /////////////
+            // Another round of search:
+            this.sendFIND_NODERound2(ndAux, closestNodes, keys);
+        }
+    }
+
+
+    public void sendFIND_NODERound2(Node nd, List<Node> closestNodes, List<KademliaKey> keys) {
+        int currentIteration = 0; // must be less than ALPHA_VALUE
+
+        //builds node address for endpoint, and channel for communication.
+        String nodeAddress = nd.getAddress() + ':' + nd.getPort();
+        Channel nodeChannel = ManagedChannelBuilder.forTarget(nodeAddress).usePlaintext().build();
+        this.client = new KademliaClient(nodeChannel);
+
+        // prepares FIND_NODE message
+        NodeIdMessage req = NodeIdMessage.newBuilder().setNodeidBytes(ByteString.copyFrom(nd.nodeID.getKey())).build();
+        // sends FIND_NODE Message
+        NodeDetailsListMessage res = this.client.FIND_NODE(req);
+        // retrieves list of NodeDetail.
+        List<NodeDetailsMessage> returnedNodes = res.getNodesList();
+
+        for (NodeDetailsMessage aux : returnedNodes) {
+            // must be less than ALPHA_VALUE (max number of searches)
+            if (currentIteration > ALPHA_VALUE) {
+                break;
+            }
+            // creates Node from NdDetailsMessage using factory
+            Node ndAux = Node.fromNodeDetailsMessage(aux);
+            this.addToBucket(ndAux);
+
+            if (ndAux.nodeID.calculateDistance(myKey) < 0) {
+                // if distance between this node and me is less than 0 -->
+                closestNodes.add(ndAux);
+                //idistance = node.nodeId
+                //?
+                //if ((!ikbucket.inRange(iaddress) && BigInteger.valueOf(Integer.valueOf(closest.size())).compareTo(ikbucket.k) == 0) || (ikbucket.inRange(iaddress) && closest.size() == 10))
+                // if we got our result:
+                //    return closestNodes;
+            }
+
+            /////////////
+            // Round 3 //
+            /////////////
+            // Last round of search:
+            this.sendFIND_NODERound3(ndAux, closestNodes, keys, currentIteration);
+
+        }
+
+    }
+
+    public void sendFIND_NODERound3(Node nd, List<Node> closestNodes, List<KademliaKey> keys, int currentIteration) {
+
+        for (KademliaKey auxK : keys) {
+            if (currentIteration >= ALPHA_VALUE) {
+                break;
+            }
+            // if the node we are checking doesnt have the same key as the aux key:
+            if (!nd.nodeID.equals(auxK)) {
+                // increases iteration.
+                currentIteration++;
+
+                //builds node address for endpoint, and channel for communication.
+                String nodeAddress = nd.getAddress() + ':' + nd.getPort();
+                Channel nodeChannel = ManagedChannelBuilder.forTarget(nodeAddress).usePlaintext().build();
+                this.client = new KademliaClient(nodeChannel);
+
+                // prepares FIND_NODE message
+                NodeIdMessage req = NodeIdMessage.newBuilder().setNodeidBytes(ByteString.copyFrom(auxK.getKey())).build();
+                // sends FIND_NODE Message
+                NodeDetailsListMessage res = this.client.FIND_NODE(req);
+                // retrieves list of NodeDetail.
+                List<NodeDetailsMessage> returnedNodes = res.getNodesList();
+
+                for (NodeDetailsMessage aux : returnedNodes) {
+                    // creates Node from NdDetailsMessage using factory
+                    Node ndAux = Node.fromNodeDetailsMessage(aux);
+                    this.addToBucket(ndAux);
+                    //idistance = node.nodeId
+                    //?
+                    //if ((!ikbucket.inRange(iaddress) && BigInteger.valueOf(Integer.valueOf(closest.size())).compareTo(ikbucket.k) == 0) || (ikbucket.inRange(iaddress) && closest.size() == 10))
+                    // if we got our result:
+                    //    return closestNodes;
                 }
             }
         }
-    } else {
-        System.out.println("null");
     }
-    ////logger.info("ended lookup");
-        return closest;
+
+    public void addToBucket(Node nd) {
+        // se os buckets estiverem vazios, criar novo com e adicionar lá o no.
+        if (this.buckets.isEmpty()) {
+            KBucket newBucket = new KBucket(new KademliaKey());
+            this.buckets.add(newBucket);
+            nd.bucket = newBucket;
+            // ??? adds itself? ; ver melhor isto
+            nd.addNodeToBucket(nd);
+            return;
+        }
+
+        for (KBucket aux : this.buckets) {
+            if (true/*aux.inRange? Dentro do alcance definido?*/) {
+                /*trocar a ordem das condiçoes ?*/
+                if (true/* ja existir no bucket*/) {
+
+                }
+                else if (true /*o bucket nao esta cheio*/) {
+
+                }
+                else if (true/*esta no range do bucket inicial e tem menos de 160 buckets -> split*/) {
+
+                }
+                else if (true/*se esta cheio*/) {
+                    if (true/*esta no range do bucket inicial e tem menos de 160 buckets -> split */) {
+
+                    }
+                    else if (true /*if the appropriate k-bucket is full, however then the recipient pings de k-buckets least-recently seen node to decide what to d*/)
+                }
+            }
+        }
+
+
     }
 }
