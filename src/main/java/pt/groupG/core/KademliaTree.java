@@ -4,9 +4,7 @@ import com.google.protobuf.ByteString;
 import io.grpc.Channel;
 import io.grpc.ManagedChannelBuilder;
 import pt.groupG.core.blockchain.Blockchain;
-import pt.groupG.grpc.NodeDetailsListMessage;
-import pt.groupG.grpc.NodeDetailsMessage;
-import pt.groupG.grpc.NodeIdMessage;
+import pt.groupG.grpc.*;
 
 import java.util.*;
 
@@ -204,26 +202,55 @@ public class KademliaTree {
         }
 
         for (KBucket aux : this.buckets) {
-            if (true/*aux.inRange? Dentro do alcance definido?*/) {
-                /*trocar a ordem das condiçoes ?*/
-                if (true/* ja existir no bucket*/) {
+            if ( aux.key.checkRange(nd.nodeID) ) { /*Dentro do alcance definido?*/
 
+                // Check if the node is inside the bucket.
+                Node ndx = aux.fetchNode(nd.nodeID);
+                if (ndx != null) {
+                    // removes the fetched node.
+                    boolean ignore = aux.removeNode(ndx);
+                    // adds the new one
+                    aux.addNode(nd);
+                    // assigns bucket to the new node.
+                    nd.bucket = aux;
                 }
-                else if (true /*o bucket nao esta cheio*/) {
-
+                else if (/*verifica se o no nao esta cheio*/) {
+                    aux.addNode(nd);
+                    nd.bucket = aux;
                 }
-                else if (true/*esta no range do bucket inicial e tem menos de 160 buckets -> split*/) {
-
-                }
-                else if (true/*se esta cheio*/) {
-                    if (true/*esta no range do bucket inicial e tem menos de 160 buckets -> split */) {
-
+                else if (/*se esta cheio*/) {
+                    //in range; less than max buckets
+                    if (aux.key.checkRange(this.myKey)) {
+                        aux.addNode(nd);
+                        nd.bucket = aux;
+                        // splitBucket(aux):
+                        break;
                     }
-                    else if (true /*if the appropriate k-bucket is full, however then the recipient pings de k-buckets least-recently seen node to decide what to d*/)
+                    else {
+                        // not in range, ping to decide:
+                        Node firstNode = aux.getFirstNode();
+                        EmptyMessage req = EmptyMessage.newBuilder().build();
+                        Channel channel = ManagedChannelBuilder.forAddress(firstNode.getAddress(), firstNode.getPort()).usePlaintext().build();
+                        this.client = new KademliaClient(channel);
+                        BooleanMessage res = this.client.PING(req);
+                        if (res.getValue()) {
+                            // received ping -> adds node to end of list
+                            aux.removeNode(firstNode);
+                            aux.addNode(firstNode);
+                        }
+                        else {
+                            // ping no received -> new node to end of list
+                            aux.removeNode(firstNode);
+                            aux.addNode(nd);
+                            nd.bucket = aux;
+                        }
+                    }
+                    // has done changes so
+                    break;
                 }
+
             }
         }
-
-
+        
     }
 }

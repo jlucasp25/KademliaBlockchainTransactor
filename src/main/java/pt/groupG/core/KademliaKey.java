@@ -89,11 +89,22 @@ public class KademliaKey {
         return (MAX_KEY_SIZE - XOR(aux).getFirstBitOn());
     }
 
+    public boolean checkRange(KademliaKey k) {
+        /* errado - é preciso ver bit a bit em vez de byte a byte.*/
+        for (int i = 0; i < MAX_KEY_SIZE ; i++) {
+            if (this.key[i] != k.key[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public boolean equals(KademliaKey aux) {
+        /* errado - é preciso ver bit a bit em vez de byte a byte.*/
         for (int i = 0; i < this.key.length; i++) {
             if (this.key[i] != aux.key[i])
-                return true;
+                return false;
         }
-        return false;
+        return true;
     }
 }

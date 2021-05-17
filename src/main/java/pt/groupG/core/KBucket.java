@@ -50,6 +50,29 @@ public class KBucket {
         }
     }
 
+    public Node fetchNode(KademliaKey k) {
+        for (Node aux : this.contacts) {
+            if (aux.nodeID.equals(k))
+                return aux;
+        }
+        return null;
+    }
+
+    public boolean removeNode(Node nd) {
+        for (Node aux : this.contacts) {
+            if (aux.equals(nd)) {
+                this.contacts.remove(aux);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Node getFirstNode() {
+        return this.contacts.get(0);
+    }
+
+
 
 //    public List<Node> findClosestNodes(Node target) {
 //        List<Node> closestNodes = new ArrayList<Node>();
