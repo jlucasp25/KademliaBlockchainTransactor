@@ -1,13 +1,18 @@
 package pt.groupG.core;
 
-import java.util.ArrayList;
+import pt.groupG.grpc.EmptyMessage;
+
 import java.util.LinkedList;
 import java.util.List;
 
 public class KBucket {
+    /**
+     * KBucket
+     * Contains a list of contacts for the current bit of the key space.
+     */
     public static int MAX_CONTACTS = 20;
     public static int ALPHA_VALUE = 3;
-    public List<Node> contacts = new LinkedList<Node>();
+    public List<Contact> contacts = new LinkedList<Contact>();
     public KademliaKey key = new KademliaKey();
     private int depth = 0;
 
@@ -29,49 +34,33 @@ public class KBucket {
     }
 
     /**
+     * Adds a node to K-Bucket.
      * If the bucket doesnt contain the node and its not full, append the node.
-     * (The Contact equals isnt fully working)
-     * @param nd
+     * Else discard it after popping the 1st element and pushing to the end of the list.
      */
-    public void addNode(Node nd) {
-        Contact aux = new Contact(nd);
-        if ( (!this.contacts.contains(aux)) && this.contacts.size() < MAX_CONTACTS ) {
-            this.contacts.add(aux);
+    public void addNode(Node aux) {
+        Contact c = Contact.fromNode(aux);
+        if ( (!this.contacts.contains(c)) && this.contacts.size() < MAX_CONTACTS ) {
+            this.contacts.add(c);
         }
         else if (this.contacts.size() >= MAX_CONTACTS) {
-            //recepient pings the least recently seen node in the k bucket aka in the head of the list to decide what to do.
-            // ping(contacts.first())
-            // if ping fails -> remove contacts.first(); add aux to tail [ contacts.add(aux) ]
-            // else
-            // remove contacts.first() and add to end of list; new contact is discarded.
-         }
-        else {
-            // Dont do anything;
-        }
-    }
-
-    public Node fetchNode(KademliaKey k) {
-        for (Node aux : this.contacts) {
-            if (aux.nodeID.equals(k))
-                return aux;
-        }
-        return null;
-    }
-
-    public boolean removeNode(Node nd) {
-        for (Node aux : this.contacts) {
-            if (aux.equals(nd)) {
-                this.contacts.remove(aux);
-                return true;
+            // recepient pings the least recently seen node in the k bucket aka
+            // in the head of the list to decide what to do. "ping(contacts.first())"
+            Contact leastRecentlySeen = this.contacts.get(0);
+            KademliaClient kc = new KademliaClient(leastRecentlySeen.getAddress(), leastRecentlySeen.getPort());
+            boolean response = kc.PING(EmptyMessage.newBuilder().build());
+            if (response) {
+                // remove contacts.first() and add to end of list; new contact is discarded.
+                this.contacts.remove(leastRecentlySeen);
+                this.contacts.add(leastRecentlySeen);
             }
-        }
-        return false;
+            else {
+                // if ping fails -> remove contacts.first(); add new to tail [ contacts.add(aux) ]
+                this.contacts.remove(leastRecentlySeen);
+                this.contacts.add(c);
+            }
+         }
     }
-
-    public Node getFirstNode() {
-        return this.contacts.get(0);
-    }
-
 
 
 //    public List<Node> findClosestNodes(Node target) {

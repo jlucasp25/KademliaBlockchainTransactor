@@ -1,23 +1,34 @@
 package pt.groupG.core;
 
-public class Contact {
-    private Node node;
-
-    public Contact(Node aux) {
-        this.node = aux;
+public class Contact extends Node {
+    /**
+     * Contact
+     * Proxy class to represent contact information using Node base class.
+     */
+    public Contact(KademliaKey nodeID, String address, int port) {
+        super(nodeID, address, port);
+        this.routingTable = null;
     }
 
-
-    public Node getNode() {
-        return node;
+    /**
+     * Factory Constructor for Contacts using Node.
+     */
+    public static Contact fromNode(Node nd) {
+        return new Contact(nd.nodeID, nd.getAddress(), nd.getPort());
     }
 
-    public boolean equals(Contact aux) {
-        if (this.node == aux.node) {
+    @Override
+    public boolean equals(Object aux) {
+        if (aux == this)
             return true;
-        }
-        else {
+
+        if (!(aux instanceof Contact)) {
             return false;
         }
+
+        Contact cAux = (Contact) aux;
+
+        // if both ids are equal, its the same node.
+        return this.nodeID.equals(cAux.nodeID);
     }
 }

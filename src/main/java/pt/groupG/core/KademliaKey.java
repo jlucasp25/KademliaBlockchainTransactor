@@ -2,7 +2,10 @@ package pt.groupG.core;
 
 import java.util.Random;
 
+
 public class KademliaKey {
+    public static final boolean DEBUG = false;
+
     public final static int MAX_KEY_SIZE = 256;
     private byte[] key;
     private String hash;
@@ -20,16 +23,21 @@ public class KademliaKey {
         this.key = key;
     }
 
+    /**
+     * Generates key with all 1's set.
+     * -- WORKING --
+     */
     public static KademliaKey generateMaxDistanceKey() {
         byte[] keyArray = new byte[MAX_KEY_SIZE/8];
-        for (int i = 0; i < (MAX_KEY_SIZE/8) - 1 ; i++) {
-            keyArray[i] = (byte) 1;
+        for (int i = 0; i < (MAX_KEY_SIZE/8) ; i++) {
+            keyArray[i] = (byte) 0xFF;
         }
         return new KademliaKey(keyArray);
     }
 
     /**
      * Calculates distance between 2 nodes.
+     * -- WORKING --
      * @param aux
      * @return KademliaKey
      */
@@ -39,7 +47,6 @@ public class KademliaKey {
         for (int i = 0; i < (MAX_KEY_SIZE/8); i++) {
             result[i] = (byte) (this.key[i] ^ auxBytes[i]);
         }
-
         return new KademliaKey(result);
     }
 
@@ -48,6 +55,7 @@ public class KademliaKey {
      * |OR|
      * The number of leading zeros on the key.
      * Useful to calculate distances.
+     *  -- WORKING --
      * @return int
      */
     public int getFirstBitOn() {
@@ -79,13 +87,14 @@ public class KademliaKey {
 
     /**
      * Calculates the distance between two keys and returns it as integer.
+     *      * -- WORKING -- ????
      * @return int
      */
     public int calculateDistance(KademliaKey aux) {
         /*
-        * new_key <- this XOR aux
-        * distance <- KEY_SIZE - new_key.first_on_bit -> prefix
-        * */
+         * new_key <- this XOR aux
+         * distance <- KEY_SIZE - new_key.first_on_bit -> prefix
+         * */
         return (MAX_KEY_SIZE - XOR(aux).getFirstBitOn());
     }
 
@@ -99,12 +108,33 @@ public class KademliaKey {
         return true;
     }
 
+    /**
+     * Checks if 2 keys are equal.
+     *      * -- WORKING --
+     */
     public boolean equals(KademliaKey aux) {
-        /* errado - é preciso ver bit a bit em vez de byte a byte.*/
+
         for (int i = 0; i < this.key.length; i++) {
-            if (this.key[i] != aux.key[i])
+            String thisBit = Integer.toBinaryString((this.key[i] & 0xFF) + 0x100).substring(1);
+            String auxBit = Integer.toBinaryString((aux.key[i] & 0xFF) + 0x100).substring(1);
+            if (!thisBit.equals(auxBit)) {
                 return false;
+            }
         }
         return true;
+    }
+
+    /**
+     *      * -- WORKING --
+     *
+     */
+    public String toString() {
+        String str = "";
+        for (byte b : this.key) {
+            str += Integer.toBinaryString((b & 0xFF) + 0x100).substring(1);
+        }
+        if (DEBUG)
+            System.out.println( "Key Size -> " + str.length());
+        return str;
     }
 }

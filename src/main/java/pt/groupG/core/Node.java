@@ -1,18 +1,20 @@
 package pt.groupG.core;
 
-import com.google.protobuf.ByteString;
 import pt.groupG.grpc.NodeDetailsMessage;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.util.Comparator;
-import java.util.LinkedList;
 
 public class Node {
+    /**
+     * Node
+     * Stores the network information, ID and the Routing Table information of a node.
+     * The routing table contains the list of contacts.
+     */
     public KademliaKey nodeID;
     private String address;
     private int port;
-    public KBucket bucket;
+    public RoutingTable routingTable;
+    // public KBucket bucket;
 
     public String getAddress() {
         return address;
@@ -41,9 +43,6 @@ public class Node {
     }
 
 
-    public void addNodeToBucket(Node aux) {
-        this.bucket.addNode(aux);
-    }
 
     /**
      * Factory Constructor for Node using a NodeDetailsmessage object.

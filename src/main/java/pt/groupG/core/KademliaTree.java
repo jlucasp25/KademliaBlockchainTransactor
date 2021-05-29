@@ -1,7 +1,7 @@
 package pt.groupG.core;
 
 import com.google.protobuf.ByteString;
-import io.grpc.Channel;
+import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import pt.groupG.core.blockchain.Blockchain;
 import pt.groupG.grpc.*;
@@ -62,6 +62,7 @@ public class KademliaTree {
                 sendFIND_NODE(i, lessDistance, parentNodes, closestNodes, keys);
             }
         }
+        return new LinkedList<Node>();
     }
 
     public void sendFIND_NODE(int i, int lessDistance, List<Node> parentNodes, List<Node> closestNodes, List<KademliaKey> keys) {
@@ -76,7 +77,7 @@ public class KademliaTree {
 
         //builds node address for endpoint, and channel for communication.
         String nodeAddress = nd.getAddress() + ':' + nd.getPort();
-        Channel nodeChannel = ManagedChannelBuilder.forTarget(nodeAddress).usePlaintext().build();
+        ManagedChannel nodeChannel = ManagedChannelBuilder.forTarget(nodeAddress).usePlaintext().build();
         this.client = new KademliaClient(nodeChannel);
 
         // prepares FIND_NODE message
@@ -89,7 +90,7 @@ public class KademliaTree {
         for (NodeDetailsMessage aux : returnedNodes) {
             // creates Node from NdDetailsMessage using factory
             Node ndAux = Node.fromNodeDetailsMessage(aux);
-            this.addToBucket(ndAux);
+           // this.addToBucket(ndAux);
             if (ndAux.nodeID.calculateDistance(myKey) < 0) {
                 // if distance between this node and me is less than 0 -->
                 closestNodes.add(ndAux);
@@ -114,7 +115,7 @@ public class KademliaTree {
 
         //builds node address for endpoint, and channel for communication.
         String nodeAddress = nd.getAddress() + ':' + nd.getPort();
-        Channel nodeChannel = ManagedChannelBuilder.forTarget(nodeAddress).usePlaintext().build();
+        ManagedChannel nodeChannel = ManagedChannelBuilder.forTarget(nodeAddress).usePlaintext().build();
         this.client = new KademliaClient(nodeChannel);
 
         // prepares FIND_NODE message
@@ -131,7 +132,7 @@ public class KademliaTree {
             }
             // creates Node from NdDetailsMessage using factory
             Node ndAux = Node.fromNodeDetailsMessage(aux);
-            this.addToBucket(ndAux);
+            //this.addToBucket(ndAux);
 
             if (ndAux.nodeID.calculateDistance(myKey) < 0) {
                 // if distance between this node and me is less than 0 -->
@@ -148,9 +149,7 @@ public class KademliaTree {
             /////////////
             // Last round of search:
             this.sendFIND_NODERound3(ndAux, closestNodes, keys, currentIteration);
-
         }
-
     }
 
     public void sendFIND_NODERound3(Node nd, List<Node> closestNodes, List<KademliaKey> keys, int currentIteration) {
@@ -166,7 +165,7 @@ public class KademliaTree {
 
                 //builds node address for endpoint, and channel for communication.
                 String nodeAddress = nd.getAddress() + ':' + nd.getPort();
-                Channel nodeChannel = ManagedChannelBuilder.forTarget(nodeAddress).usePlaintext().build();
+                ManagedChannel nodeChannel = ManagedChannelBuilder.forTarget(nodeAddress).usePlaintext().build();
                 this.client = new KademliaClient(nodeChannel);
 
                 // prepares FIND_NODE message
@@ -179,7 +178,7 @@ public class KademliaTree {
                 for (NodeDetailsMessage aux : returnedNodes) {
                     // creates Node from NdDetailsMessage using factory
                     Node ndAux = Node.fromNodeDetailsMessage(aux);
-                    this.addToBucket(ndAux);
+                   // this.addToBucket(ndAux);
                     //idistance = node.nodeId
                     //?
                     //if ((!ikbucket.inRange(iaddress) && BigInteger.valueOf(Integer.valueOf(closest.size())).compareTo(ikbucket.k) == 0) || (ikbucket.inRange(iaddress) && closest.size() == 10))
@@ -190,67 +189,67 @@ public class KademliaTree {
         }
     }
 
-    public void addToBucket(Node nd) {
-        // se os buckets estiverem vazios, criar novo com e adicionar lá o no.
-        if (this.buckets.isEmpty()) {
-            KBucket newBucket = new KBucket(new KademliaKey());
-            this.buckets.add(newBucket);
-            nd.bucket = newBucket;
-            // ??? adds itself? ; ver melhor isto
-            nd.addNodeToBucket(nd);
-            return;
-        }
-
-        for (KBucket aux : this.buckets) {
-            if ( aux.key.checkRange(nd.nodeID) ) { /*Dentro do alcance definido?*/
-
-                // Check if the node is inside the bucket.
-                Node ndx = aux.fetchNode(nd.nodeID);
-                if (ndx != null) {
-                    // removes the fetched node.
-                    boolean ignore = aux.removeNode(ndx);
-                    // adds the new one
-                    aux.addNode(nd);
-                    // assigns bucket to the new node.
-                    nd.bucket = aux;
-                }
-                else if (/*verifica se o no nao esta cheio*/) {
-                    aux.addNode(nd);
-                    nd.bucket = aux;
-                }
-                else if (/*se esta cheio*/) {
-                    //in range; less than max buckets
-                    if (aux.key.checkRange(this.myKey)) {
-                        aux.addNode(nd);
-                        nd.bucket = aux;
-                        // splitBucket(aux):
-                        break;
-                    }
-                    else {
-                        // not in range, ping to decide:
-                        Node firstNode = aux.getFirstNode();
-                        EmptyMessage req = EmptyMessage.newBuilder().build();
-                        Channel channel = ManagedChannelBuilder.forAddress(firstNode.getAddress(), firstNode.getPort()).usePlaintext().build();
-                        this.client = new KademliaClient(channel);
-                        BooleanMessage res = this.client.PING(req);
-                        if (res.getValue()) {
-                            // received ping -> adds node to end of list
-                            aux.removeNode(firstNode);
-                            aux.addNode(firstNode);
-                        }
-                        else {
-                            // ping no received -> new node to end of list
-                            aux.removeNode(firstNode);
-                            aux.addNode(nd);
-                            nd.bucket = aux;
-                        }
-                    }
-                    // has done changes so
-                    break;
-                }
-
-            }
-        }
-        
-    }
+//    public void addToBucket(Node nd) {
+//        // se os buckets estiverem vazios, criar novo com e adicionar lá o no.
+//        if (this.buckets.isEmpty()) {
+//            KBucket newBucket = new KBucket(new KademliaKey());
+//            this.buckets.add(newBucket);
+//            nd.bucket = newBucket;
+//            // ??? adds itself? ; ver melhor isto
+//            nd.addNodeToBucket(nd);
+//            return;
+//        }
+//
+//        for (KBucket aux : this.buckets) {
+//            if ( aux.key.checkRange(nd.nodeID) ) { /*Dentro do alcance definido?*/
+//
+//                // Check if the node is inside the bucket.
+//                Node ndx = aux.fetchNode(nd.nodeID);
+//                if (ndx != null) {
+//                    // removes the fetched node.
+//                    boolean ignore = aux.removeNode(ndx);
+//                    // adds the new one
+//                    aux.addNode(nd);
+//                    // assigns bucket to the new node.
+//                    nd.bucket = aux;
+//                }
+//                else if (true/*verifica se o no nao esta cheio*/) {
+//                    aux.addNode(nd);
+//                    nd.bucket = aux;
+//                }
+//                else if (true /*se esta cheio*/) {
+//                    //in range; less than max buckets
+//                    if (aux.key.checkRange(this.myKey)) {
+//                        aux.addNode(nd);
+//                        nd.bucket = aux;
+//                        // splitBucket(aux):
+//                        break;
+//                    }
+//                    else {
+//                        // not in range, ping to decide:
+//                        Node firstNode = aux.getFirstNode();
+//                        EmptyMessage req = EmptyMessage.newBuilder().build();
+//                        ManagedChannel channel = ManagedChannelBuilder.forAddress(firstNode.getAddress(), firstNode.getPort()).usePlaintext().build();
+//                        this.client = new KademliaClient(channel);
+//                        boolean res = this.client.PING(req);
+//                        if (res) {
+//                            // received ping -> adds node to end of list
+//                            aux.removeNode(firstNode);
+//                            aux.addNode(firstNode);
+//                        }
+//                        else {
+//                            // ping no received -> new node to end of list
+//                            aux.removeNode(firstNode);
+//                            aux.addNode(nd);
+//                            nd.bucket = aux;
+//                        }
+//                    }
+//                    // has done changes so
+//                    break;
+//                }
+//
+//            }
+//        }
+//
+//    }
 }
