@@ -16,6 +16,8 @@ public class KademliaClient {
     private int port;
     private ServerServiceGrpc.ServerServiceBlockingStub stub;
     private ManagedChannel channel;
+    public Node self;
+    public RoutingTable routingTable;
 
     KademliaClient(ManagedChannel channel) {
         this.channel = channel;
@@ -25,6 +27,16 @@ public class KademliaClient {
     public KademliaClient(String host, int port) {
         this.host = host;
         this.port = port;
+    }
+
+    public void setRoutingTable(RoutingTable routingTable) {
+        this.routingTable = routingTable;
+    }
+
+    public void setNodefromJOIN(String key, String address, int port) {
+        KademliaKey kKey = new KademliaKey(key);
+        this.self = new Node(kKey, address, port);
+        this.routingTable.setSelfNode(this.self);
     }
 
     public void initializeConnection() {
@@ -46,9 +58,9 @@ public class KademliaClient {
         return res.getValue();
     }
 
-    public JoinMessage JOIN(EmptyMessage req) {
+    public NodeIdMessage JOIN(JoinMessage req) {
         System.out.println("CLIENT: Sent JOIN");
-        JoinMessage res = null;
+        NodeIdMessage res = null;
         res = this.stub.join(req);
         return res;
     }

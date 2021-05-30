@@ -62,15 +62,10 @@ public class KBucket {
          }
     }
 
-
-//    public List<Node> findClosestNodes(Node target) {
-//        List<Node> closestNodes = new ArrayList<Node>();
-//        for (Node aux : this.contacts) {
-//            if (closestNodes.size() < ALPHA_VALUE) {
-//                closestNodes.add(aux);
-//            }
-//        }
-//        return closestNodes;
-//    }
-
+    public String toString() {
+        if (this.contacts.size() != 0) {
+            return "[+] K-Bucket w/Depth " + this.depth + " | Number of Contacts: " + this.contacts.size();
+        }
+        return null;
+    }
 }

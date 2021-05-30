@@ -23,6 +23,10 @@ public class KademliaKey {
         this.key = key;
     }
 
+    public KademliaKey(String key) {
+       this.key = getByteByString(key);
+    }
+
     /**
      * Generates key with all 1's set.
      * -- WORKING --
@@ -95,7 +99,7 @@ public class KademliaKey {
          * new_key <- this XOR aux
          * distance <- KEY_SIZE - new_key.first_on_bit -> prefix
          * */
-        return (MAX_KEY_SIZE - XOR(aux).getFirstBitOn());
+        return (MAX_KEY_SIZE - this.XOR(aux).getFirstBitOn());
     }
 
     public boolean checkRange(KademliaKey k) {
@@ -136,5 +140,34 @@ public class KademliaKey {
         if (DEBUG)
             System.out.println( "Key Size -> " + str.length());
         return str;
+    }
+
+    /**
+     * External function to convert strings into byte[].
+     * https://stackoverflow.com/questions/23664078/how-do-i-convert-a-large-binary-string-to-byte-array-java/40847030#40847030
+     */
+    public static byte[] getByteByString(String binaryString) {
+        int splitSize = 8;
+
+        if(binaryString.length() % splitSize == 0){
+            int index = 0;
+            int position = 0;
+
+            byte[] resultByteArray = new byte[binaryString.length()/splitSize];
+            StringBuilder text = new StringBuilder(binaryString);
+
+            while (index < text.length()) {
+                String binaryStringChunk = text.substring(index, Math.min(index + splitSize, text.length()));
+                Integer byteAsInt = Integer.parseInt(binaryStringChunk, 2);
+                resultByteArray[position] = byteAsInt.byteValue();
+                index += splitSize;
+                position ++;
+            }
+            return resultByteArray;
+        }
+        else{
+            System.out.println("Cannot convert binary string to byte[], because of the input length. '" +binaryString+"' % 8 != 0");
+            return null;
+        }
     }
 }

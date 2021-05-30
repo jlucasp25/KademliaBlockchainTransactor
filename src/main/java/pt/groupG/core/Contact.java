@@ -7,7 +7,6 @@ public class Contact extends Node {
      */
     public Contact(KademliaKey nodeID, String address, int port) {
         super(nodeID, address, port);
-        this.routingTable = null;
     }
 
     /**

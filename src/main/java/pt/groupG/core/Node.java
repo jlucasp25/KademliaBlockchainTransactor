@@ -13,8 +13,6 @@ public class Node {
     public KademliaKey nodeID;
     private String address;
     private int port;
-    public RoutingTable routingTable;
-    // public KBucket bucket;
 
     public String getAddress() {
         return address;
@@ -26,6 +24,13 @@ public class Node {
 
     public int getPort() {
         return port;
+    }
+
+    /**
+     * Calls calculate distance to determine position on the kademlia tree.
+     */
+    public int calculateDistance(Node aux) {
+        return this.nodeID.calculateDistance(aux.nodeID);
     }
 
     public void setPort(int port) {
