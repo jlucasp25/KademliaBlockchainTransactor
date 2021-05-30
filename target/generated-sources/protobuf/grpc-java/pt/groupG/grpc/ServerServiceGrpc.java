@@ -27,29 +27,29 @@ public final class ServerServiceGrpc {
   public static final String SERVICE_NAME = "pt.groupG.grpc.ServerService";
 
   // Static method descriptors that strictly reflect the proto.
-  private static volatile io.grpc.MethodDescriptor<pt.groupG.grpc.EmptyMessage,
-      pt.groupG.grpc.JoinMessage> getJoinMethod;
+  private static volatile io.grpc.MethodDescriptor<pt.groupG.grpc.JoinMessage,
+      pt.groupG.grpc.NodeIdMessage> getJoinMethod;
 
   @io.grpc.stub.annotations.RpcMethod(
       fullMethodName = SERVICE_NAME + '/' + "join",
-      requestType = pt.groupG.grpc.EmptyMessage.class,
-      responseType = pt.groupG.grpc.JoinMessage.class,
+      requestType = pt.groupG.grpc.JoinMessage.class,
+      responseType = pt.groupG.grpc.NodeIdMessage.class,
       methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
-  public static io.grpc.MethodDescriptor<pt.groupG.grpc.EmptyMessage,
-      pt.groupG.grpc.JoinMessage> getJoinMethod() {
-    io.grpc.MethodDescriptor<pt.groupG.grpc.EmptyMessage, pt.groupG.grpc.JoinMessage> getJoinMethod;
+  public static io.grpc.MethodDescriptor<pt.groupG.grpc.JoinMessage,
+      pt.groupG.grpc.NodeIdMessage> getJoinMethod() {
+    io.grpc.MethodDescriptor<pt.groupG.grpc.JoinMessage, pt.groupG.grpc.NodeIdMessage> getJoinMethod;
     if ((getJoinMethod = ServerServiceGrpc.getJoinMethod) == null) {
       synchronized (ServerServiceGrpc.class) {
         if ((getJoinMethod = ServerServiceGrpc.getJoinMethod) == null) {
           ServerServiceGrpc.getJoinMethod = getJoinMethod =
-              io.grpc.MethodDescriptor.<pt.groupG.grpc.EmptyMessage, pt.groupG.grpc.JoinMessage>newBuilder()
+              io.grpc.MethodDescriptor.<pt.groupG.grpc.JoinMessage, pt.groupG.grpc.NodeIdMessage>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
               .setFullMethodName(generateFullMethodName(SERVICE_NAME, "join"))
               .setSampledToLocalTracing(true)
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  pt.groupG.grpc.EmptyMessage.getDefaultInstance()))
-              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
                   pt.groupG.grpc.JoinMessage.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  pt.groupG.grpc.NodeIdMessage.getDefaultInstance()))
               .setSchemaDescriptor(new ServerServiceMethodDescriptorSupplier("join"))
               .build();
         }
@@ -180,8 +180,8 @@ public final class ServerServiceGrpc {
 
     /**
      */
-    public void join(pt.groupG.grpc.EmptyMessage request,
-        io.grpc.stub.StreamObserver<pt.groupG.grpc.JoinMessage> responseObserver) {
+    public void join(pt.groupG.grpc.JoinMessage request,
+        io.grpc.stub.StreamObserver<pt.groupG.grpc.NodeIdMessage> responseObserver) {
       asyncUnimplementedUnaryCall(getJoinMethod(), responseObserver);
     }
 
@@ -212,8 +212,8 @@ public final class ServerServiceGrpc {
             getJoinMethod(),
             asyncUnaryCall(
               new MethodHandlers<
-                pt.groupG.grpc.EmptyMessage,
-                pt.groupG.grpc.JoinMessage>(
+                pt.groupG.grpc.JoinMessage,
+                pt.groupG.grpc.NodeIdMessage>(
                   this, METHODID_JOIN)))
           .addMethod(
             getPingMethod(),
@@ -260,8 +260,8 @@ public final class ServerServiceGrpc {
 
     /**
      */
-    public void join(pt.groupG.grpc.EmptyMessage request,
-        io.grpc.stub.StreamObserver<pt.groupG.grpc.JoinMessage> responseObserver) {
+    public void join(pt.groupG.grpc.JoinMessage request,
+        io.grpc.stub.StreamObserver<pt.groupG.grpc.NodeIdMessage> responseObserver) {
       asyncUnaryCall(
           getChannel().newCall(getJoinMethod(), getCallOptions()), request, responseObserver);
     }
@@ -311,7 +311,7 @@ public final class ServerServiceGrpc {
 
     /**
      */
-    public pt.groupG.grpc.JoinMessage join(pt.groupG.grpc.EmptyMessage request) {
+    public pt.groupG.grpc.NodeIdMessage join(pt.groupG.grpc.JoinMessage request) {
       return blockingUnaryCall(
           getChannel(), getJoinMethod(), getCallOptions(), request);
     }
@@ -358,8 +358,8 @@ public final class ServerServiceGrpc {
 
     /**
      */
-    public com.google.common.util.concurrent.ListenableFuture<pt.groupG.grpc.JoinMessage> join(
-        pt.groupG.grpc.EmptyMessage request) {
+    public com.google.common.util.concurrent.ListenableFuture<pt.groupG.grpc.NodeIdMessage> join(
+        pt.groupG.grpc.JoinMessage request) {
       return futureUnaryCall(
           getChannel().newCall(getJoinMethod(), getCallOptions()), request);
     }
@@ -412,8 +412,8 @@ public final class ServerServiceGrpc {
     public void invoke(Req request, io.grpc.stub.StreamObserver<Resp> responseObserver) {
       switch (methodId) {
         case METHODID_JOIN:
-          serviceImpl.join((pt.groupG.grpc.EmptyMessage) request,
-              (io.grpc.stub.StreamObserver<pt.groupG.grpc.JoinMessage>) responseObserver);
+          serviceImpl.join((pt.groupG.grpc.JoinMessage) request,
+              (io.grpc.stub.StreamObserver<pt.groupG.grpc.NodeIdMessage>) responseObserver);
           break;
         case METHODID_PING:
           serviceImpl.ping((pt.groupG.grpc.EmptyMessage) request,
