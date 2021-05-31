@@ -29,7 +29,12 @@ public class KBucket {
         this.key = key;
     }
 
-    public boolean isContactsEmpty() {
+
+    /**
+     * Returns true if the k-bucket is empty.
+     * @return
+     */
+    public boolean isEmpty() {
         return this.contacts.isEmpty();
     }
 

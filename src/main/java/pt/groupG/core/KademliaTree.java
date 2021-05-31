@@ -25,7 +25,7 @@ public class KademliaTree {
         KBucket closest = null;
         /* Search all non-empty kbuckets for the closest one. */
         for (KBucket aux : buckets) {
-            if (!aux.isContactsEmpty()) {
+            if (!aux.isEmpty()) {
                 KademliaKey i = aux.key;
                 int calculatedDistance = k.calculateDistance(i);
                 if (calculatedDistance < lessDistance) {
