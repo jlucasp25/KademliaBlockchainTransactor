@@ -43,6 +43,10 @@ public class Node {
         this.port = port;
     }
 
+    public static Node fromContact(Contact aux) {
+        return new Node(aux.nodeID, null, 0);
+    }
+
     public void findNode(Node target) {
 
     }

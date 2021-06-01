@@ -59,11 +59,14 @@ public class RoutingTable {
         return total;
     }
 
+    // TODO
+    // Replace argument to Key
     void FIND_NODE(Node nd) {
         // MAX Close nodes == alpha
-        KBucket closestBucket = this.fetchClosestNonEmptyBucket(nd.nodeID);
+        Integer minDistance = 0;
+        KBucket closestBucket = this.fetchClosestNonEmptyBucket(nd.nodeID, minDistance);
         List<Contact> closestNodes = new LinkedList<Contact>();
-//        List<Contact> farAwayNodes = new LinkedList<Contact>();
+        List<Contact> farAwayNodes = new LinkedList<Contact>();
 //        for (Contact aux : closestBucket.contacts) {
 //            int distanceBetweenNodeAndTarget = aux.calculateDistance(nd);
 //            int distanceBetweenSelfAndTarget = self.calculateDistance(nd);
@@ -98,9 +101,10 @@ public class RoutingTable {
         // Limit closest contacts to alpha value or less if theres less contacts than alpha value.
         int nNodes = closestBucket.contacts.size() < ALPHA_VALUE ? closestBucket.contacts.size() : ALPHA_VALUE;
         closestNodes.addAll(closestBucket.contacts.subList(0, nNodes - 1));
+        farAwayNodes.addAll(closestBucket.contacts.subList(nNodes, closestBucket.contacts.size() - 1));
         // temporary list to hold return contacts. (ret in example)
         List<Contact> returnNodes = new LinkedList<Contact>();
-        dispatchFIND_NODE(0, nd, closestNodes, returnNodes);
+        dispatchFIND_NODE(nNodes, nd, closestNodes, farAwayNodes);
     }
 
     /**
@@ -121,49 +125,118 @@ public class RoutingTable {
     /**
      * Prepares and parses a FIND_NODE call.
      */
-    List<NodeDetailsMessage> dispatchFIND_NODE(int i, Node target, List<Contact> closestNodes, List<Contact> finalNodes) {
-        //needs to separate this block into alpha concurrent requests.
-        Contact closestContact = closestNodes.get(0);
-        // sends a FIND_NODE RPC communication
-        List<NodeDetailsMessage> returnedNodes = FIND_NODE_communication(closestContact, target);
+    List<NodeDetailsMessage> dispatchFIND_NODE(int nConcurrent, Node target, List<Contact> closestNodes, List<Contact> farAwayNodes, KBucket closestBucket) {
+        // list to remove duplicates.
+        List<KademliaKey> contactedKeys = new LinkedList<KademliaKey>();
 
-        for (NodeDetailsMessage msgAux : returnedNodes) {
-            // creates Node from NdDetailsMessage using factory
-            Contact ndAux = Contact.fromNode(Node.fromNodeDetailsMessage(msgAux));
-            // TODO
-            // comparator needs to be overriden; filtered to remove repeats.
-            finalNodes.add(ndAux);
-            // if it has found the node, return the query.
-            if (ndAux.nodeID.equals(target.nodeID))
-                return returnedNodes;
-        }
+        // current bucket key.
+        KademliaKey closestDistanceKey = closestBucket.key;
 
-        while (finalNodes.size() < 20/*K*/) {
-            // removes queried node from the closest nodes list.
-            closestNodes.remove(closestContact);
-            // if there is still close nodes:
-            List<Contact> newClosestNodes = new LinkedList<Contact>(closestNodes);
-            if (!newClosestNodes.isEmpty()) {
-                int nNodes = newClosestNodes.size() < ALPHA_VALUE ? newClosestNodes.size() : ALPHA_VALUE;
-                // TODO
-                // sort nodes again.
-                closestContact = closestNodes.get(0);
-                // sends a FIND_NODE RPC communication
-                returnedNodes = FIND_NODE_communication(closestContact, target);
-
-                for (NodeDetailsMessage msgAux : returnedNodes) {
-                    // creates Node from NdDetailsMessage using factory
-                    Contact ndAux = Contact.fromNode(Node.fromNodeDetailsMessage(msgAux));
-                    // TODO
-                    // comparator needs to be overriden; filtered to remove repeats.
-                    finalNodes.add(ndAux);
-                    // if it has found the node, return the query.
-                    if (ndAux.nodeID.equals(target.nodeID))
-                        return returnedNodes;
+        /*NOT ASYNCHRONOUS FOR NOW*/
+        for (int i = 0; i < nConcurrent; i++) {
+            Contact closestContact = closestNodes.get(i);
+            System.out.println("[!] Sending FIND_NODE RPC to " + closestContact);
+            contactedKeys.add(closestContact.nodeID);
+            List<NodeDetailsMessage> returnedNodes = FIND_NODE_communication(closestContact, target);
+            for (NodeDetailsMessage msgAux : returnedNodes) {
+                Node returnedNode = Node.fromNodeDetailsMessage(msgAux);
+                Contact returnedContact = Contact.fromNode(returnedNode);
+                // add received node to buckets.
+                this.addNode(returnedNode);
+                // if node distance is less than current bucket -> minDistance
+                if (returnedNode.nodeID.calculateDistance(closestDistanceKey) <= 0) {
+                    closestDistanceKey = returnedNode.nodeID;
+                    closestNodes.add(returnedContact);
+                    // if blabla bla 
+                    // return 
                 }
-                // (giveMeAll ? ret : ret.Take(Constants.K).OrderBy(c => c.ID ^ key).ToList()),
+                
+                // For each returned node, lets send a FIND_NODE
+                // lets add first our key to the contacted keys.
+                contactedKeys.add(returnedContact.nodeID);
+                List<NodeDetailsMessage> newReturnedNodes = FIND_NODE_communication(returnedContact, target);
+                int nRequests = 0;
+                for (NodeDetailsMessage msgAux2 : newReturnedNodes) {
+                    // cant let it the make more than ALPHA requests
+                    if (nRequests >= ALPHA_VALUE) {
+                        break;
+                    }
+                    Node returnedNode2 = Node.fromNodeDetailsMessage(msgAux2);
+                    Contact returnedContact2 = Contact.fromNode(returnedNode2);
+                    // add received node to buckets.
+                    this.addNode(returnedNode2);
+                    // if node distance is less than current bucket -> minDistance
+                    if (returnedNode.nodeID.calculateDistance(closestDistanceKey) <= 0) {
+                        closestDistanceKey = returnedNode.nodeID;
+                        closestNodes.add(returnedContact);
+                        // if blabla bla
+                        // return
+                    }
+
+                }
             }
         }
+
+//
+//
+//
+//
+//        if (!returnedNodes.isEmpty()) {
+//            boolean found = false;
+//            for (NodeDetailsMessage msgAux : returnedNodes) {
+//                // creates Node from NdDetailsMessage using factory
+//                Node ndAux = Node.fromNodeDetailsMessage(msgAux);
+//                // TODO
+//                // comparator needs to be overriden; filtered to remove repeats.
+//
+//                // Insert found contact into kbuckets. (Contact converted to node, lost info)
+//                this.addNode(ndAux);
+//
+//                /* The distance between me and me is <= 0 */
+//                if (ndAux.nodeID.calculateDistance(closestDistance) <= 0) {
+//                    // this node has the less distance, therefore is closer.
+//                    closestDistance = ndAux.nodeID;
+//                    closestNodes.add(Contact.fromNode(ndAux));
+//                }
+//            }
+//            if (closestNodes.size() >= 20) {
+//                return closestNodes.subList(0, 19);
+//            }
+//            else {
+//                //do smth
+//            }
+//        }
+//        else {
+//            // do smth
+//
+//        }
+//
+//        while (finalNodes.size() < 20/*K*/) {
+//            // removes queried node from the closest nodes list.
+//            closestNodes.remove(closestContact);
+//            // if there is still close nodes:
+//            List<Contact> newClosestNodes = new LinkedList<Contact>(closestNodes);
+//            if (!newClosestNodes.isEmpty()) {
+//                int nNodes = newClosestNodes.size() < ALPHA_VALUE ? newClosestNodes.size() : ALPHA_VALUE;
+//                // TODO
+//                // sort nodes again.
+//                closestContact = closestNodes.get(0);
+//                // sends a FIND_NODE RPC communication
+//                returnedNodes = FIND_NODE_communication(closestContact, target);
+//
+//                for (NodeDetailsMessage msgAux : returnedNodes) {
+//                    // creates Node from NdDetailsMessage using factory
+//                    Contact ndAux = Contact.fromNode(Node.fromNodeDetailsMessage(msgAux));
+//                    // TODO
+//                    // comparator needs to be overriden; filtered to remove repeats.
+//                    finalNodes.add(ndAux);
+//                    // if it has found the node, return the query.
+//                    if (ndAux.nodeID.equals(target.nodeID))
+//                        return returnedNodes;
+//                }
+//                // (giveMeAll ? ret : ret.Take(Constants.K).OrderBy(c => c.ID ^ key).ToList()),
+//            }
+//        }
     }
 
     /**
@@ -187,6 +260,5 @@ public class RoutingTable {
         }
         return closestBucket;
     }
-
 
 }
