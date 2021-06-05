@@ -7,10 +7,7 @@ import pt.groupG.grpc.NodeDetailsListMessage;
 import pt.groupG.grpc.NodeDetailsMessage;
 import pt.groupG.grpc.NodeIdMessage;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class RoutingTable {
     /**
@@ -24,6 +21,11 @@ public class RoutingTable {
     public static final int ALPHA_VALUE = 3;
     // buckets cant be bigger than maxBucketsSize
     private static final int maxBucketsSize = KademliaKey.MAX_KEY_SIZE;
+    public KademliaClient client = null;
+
+    public void setClient(KademliaClient client) {
+        this.client = client;
+    }
 
     public RoutingTable() {
         // Creates empty buckets.
@@ -61,10 +63,11 @@ public class RoutingTable {
 
     // TODO
     // Replace argument to Key
+/*
     void FIND_NODE(Node nd) {
         // MAX Close nodes == alpha
         Integer minDistance = 0;
-        KBucket closestBucket = this.fetchClosestNonEmptyBucket(nd.nodeID, minDistance);
+        KBucket closestBucket = this.fetchClosestNonEmptyBucket(nd.nodeID);
         List<Contact> closestNodes = new LinkedList<Contact>();
         List<Contact> farAwayNodes = new LinkedList<Contact>();
 //        for (Contact aux : closestBucket.contacts) {
@@ -107,9 +110,11 @@ public class RoutingTable {
         dispatchFIND_NODE(nNodes, nd, closestNodes, farAwayNodes);
     }
 
-    /**
-     * Aggregates all the communication functions to send a FIND_NODE RPC.
-     */
+    */
+/**
+ * Aggregates all the communication functions to send a FIND_NODE RPC.
+ *//*
+
     List<NodeDetailsMessage> FIND_NODE_communication(Contact contactedNode, Node targetNode) {
         String nodeAddress = contactedNode.getAddress() + ':' + contactedNode.getPort();
         ManagedChannel nodeChannel = ManagedChannelBuilder.forTarget(nodeAddress).usePlaintext().build();
@@ -122,17 +127,21 @@ public class RoutingTable {
         return res.getNodesList();
     }
 
-    /**
-     * Prepares and parses a FIND_NODE call.
-     */
-    List<NodeDetailsMessage> dispatchFIND_NODE(int nConcurrent, Node target, List<Contact> closestNodes, List<Contact> farAwayNodes, KBucket closestBucket) {
+    */
+/**
+ * Prepares and parses a FIND_NODE call.
+ *//*
+
+    List<NodeDetailsMessage> dispatchFIND_NODE(int nConcurrent, Node target, List<Contact> closestNodes, List<Contact> farAwayNodes) {
         // list to remove duplicates.
         List<KademliaKey> contactedKeys = new LinkedList<KademliaKey>();
 
         // current bucket key.
-        KademliaKey closestDistanceKey = closestBucket.key;
+        //KademliaKey closestDistanceKey = closestBucket.key;
 
-        /*NOT ASYNCHRONOUS FOR NOW*/
+        */
+    /*NOT ASYNCHRONOUS FOR NOW*//*
+
         for (int i = 0; i < nConcurrent; i++) {
             Contact closestContact = closestNodes.get(i);
             System.out.println("[!] Sending FIND_NODE RPC to " + closestContact);
@@ -176,6 +185,7 @@ public class RoutingTable {
                 }
             }
         }
+*/
 
 //
 //
@@ -237,7 +247,7 @@ public class RoutingTable {
 //                // (giveMeAll ? ret : ret.Take(Constants.K).OrderBy(c => c.ID ^ key).ToList()),
 //            }
 //        }
-    }
+
 
     /**
      * Fetches closest non-empty K-Bucket.
@@ -259,6 +269,86 @@ public class RoutingTable {
             }
         }
         return closestBucket;
+    }
+
+    /* FIND_NODE:
+     - Node P joined the network
+     - bootstrap node gives P an ID
+     - P sends FIND_NODE(P.ID) to bootstrap node
+     - boostrap node search for 3 closest nodes to P
+     - routing table of contacted nodes is continuous updated
+     */
+    public Set<Contact> getClosestsNodes(String regular_id, String bootstrap_id) {
+        Set<Contact> closestNodes = new HashSet<Contact>();
+        Set<KademliaKey> contactedNodes = new HashSet<KademliaKey>();
+        KBucket kBucket_target = fetchClosestNonEmptyBucket(new KademliaKey(bootstrap_id));
+        // for value in buckets list of bootstrap_id
+        List<Contact> closestContacts = new LinkedList<Contact>();
+        Collections.copy(closestContacts, kBucket_target.contacts);
+
+        Collections.sort(closestContacts, new Comparator<Contact>() {
+            @Override
+            public int compare(Contact c1, Contact c2) {
+                int d1 = c1.nodeID.calculateDistance(new KademliaKey(regular_id));
+                int d2 = c2.nodeID.calculateDistance(new KademliaKey(regular_id));
+                // TODO
+                // improve condition
+                if (d1 == d2) {
+                    return 0;
+                } else if (d1 < d2) {
+                    return -1;
+                } else {
+                    return 1;
+                }
+            }
+        });
+        //contactedNodes = {A,C,F}
+        closestNodes.addAll(closestContacts.subList(0, 2));
+        Set<Contact> lastClosest = new HashSet<>();
+
+        for (Contact aux : closestNodes ) {
+            contactedNodes.add(aux.nodeID);
+            NodeIdMessage f_req = NodeIdMessage.newBuilder().setNodeid(aux.nodeID.toString()).setBootstrapnodeid(bootstrap_id).build();
+            NodeDetailsListMessage f_res = client.FIND_NODE(f_req);
+            for(NodeDetailsMessage aux2 : f_res.getNodesList()) {
+                Contact aux_contact = Contact.fromNodeDetailsMessage(aux2);
+            if (!contactedNodes.contains(aux_contact.nodeID)) {
+                closestNodes.add(aux_contact);
+            }
+            if(lastClosest.equals(closestNodes))
+                break;
+            lastClosest = Set.copyOf(closestNodes);
+            }
+        }
+
+       /* if (closestContacts.size() > 3) {
+            contactedNodes.addAll(closestContacts.subList(0, 2));
+            if (lastAddedNodes.equals(closestContacts.subList(0, 2))) {
+                return lastAddedNodes;
+            } else {
+                lastAddedNodes.clear();
+            }
+            lastAddedNodes.addAll(closestContacts.subList(0, 2));
+        } else {
+            closestNodes.addAll(closestContacts.subList(0, closestContacts.size() - 1));
+            contactedNodes.addAll(closestContacts.subList(0, closestContacts.size() - 1));
+            if (lastAddedNodes.equals(closestContacts.subList(0, closestContacts.size() - 1))) {
+                return lastAddedNodes;
+            } else {
+                lastAddedNodes.clear();
+            }
+            lastAddedNodes.addAll(closestContacts.subList(0, closestContacts.size() - 1));
+        }*/
+
+
+
+
+        // sort the list and remove the 3 first nodes (min distance to regular_id)
+        // add these nodes to contactedNodes list if they are not already there
+        // add these nodes to closestNodes list
+        // if one of these nodes is already in closestNodes list, don't add
+        // if the three nodes are in closestNodes list, break and return the list
+        return closestNodes;
     }
 
 }

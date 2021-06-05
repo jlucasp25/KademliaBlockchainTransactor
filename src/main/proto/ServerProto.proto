@@ -13,6 +13,7 @@ service ServerService {
 message JoinMessage {
   string address = 1;
   int32 port = 2;
+  string initialWork = 3;
 }
 
 message BooleanMessage {

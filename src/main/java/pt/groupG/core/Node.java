@@ -47,11 +47,6 @@ public class Node {
         return new Node(aux.nodeID, null, 0);
     }
 
-    public void findNode(Node target) {
-
-    }
-
-
 
     /**
      * Factory Constructor for Node using a NodeDetailsmessage object.

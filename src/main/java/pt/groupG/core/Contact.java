@@ -1,5 +1,9 @@
 package pt.groupG.core;
 
+import pt.groupG.grpc.NodeDetailsMessage;
+
+import java.nio.charset.StandardCharsets;
+
 public class Contact extends Node {
     /**
      * Contact
@@ -14,6 +18,12 @@ public class Contact extends Node {
      */
     public static Contact fromNode(Node nd) {
         return new Contact(nd.nodeID, nd.getAddress(), nd.getPort());
+    }
+
+    public static Contact fromNodeDetailsMessage(NodeDetailsMessage msg) {
+        /*CASTS STRING TO BYTES[]; Maybe protobuf needs to be changed to bytes.*/
+        KademliaKey kdk = new KademliaKey(msg.getNodeid().getBytes(StandardCharsets.UTF_8));
+        return new Contact(kdk, msg.getAddress(), msg.getPort());
     }
 
     @Override

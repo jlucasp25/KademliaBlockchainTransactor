@@ -66,9 +66,9 @@ public class KademliaClient {
     }
 
     public NodeDetailsListMessage FIND_NODE(NodeIdMessage req) {
-        //List<Node> res = new LinkedList<Node>();
+        System.out.println("CLIENT: Sent FIND_NODE");
         NodeDetailsListMessage res = null;
-        res = stub.findNode(req);
+        res = this.stub.findNode(req);
         return res;
         // convert details list into list of nodes.
     }
