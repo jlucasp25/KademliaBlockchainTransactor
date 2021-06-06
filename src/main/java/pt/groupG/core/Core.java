@@ -1,10 +1,10 @@
 package pt.groupG.core;
 
 import Utils.HashCash;
-import Utils.StringUtils;
 import pt.groupG.core.blockchain.Block;
 import pt.groupG.grpc.JoinMessage;
 import pt.groupG.grpc.NodeDetailsListMessage;
+import pt.groupG.grpc.NodeDetailsMessage;
 import pt.groupG.grpc.NodeIdMessage;
 
 import java.io.IOException;
@@ -27,6 +27,11 @@ public class Core {
     public static RoutingTable routingTable = new RoutingTable();
     public static Node selfNode;
 
+    public static void generateBootstrapNode(String address, int port) {
+        KademliaKey kKey = new KademliaKey();
+        selfNode = new Node(kKey, address, port);
+    }
+
     // Blockchain
     public static List<Block> blockchain = new LinkedList<Block>();
 
@@ -42,14 +47,12 @@ public class Core {
                 System.out.println("Initial Work failed. Couldn't enter the network!");
                 return;
             }
-
-
             // send initialWork to bootstrap node for validation
             // only after this validation, can the node join the network
-            setupRegularNode(initialWork);
+            setupNodeAsRegular(initialWork);
         }
         else if(s.equals("2")) { // o bootstrap node tem de ser sempre o mesmo, n deixar o gajo criar
-            setupBootstrapNode();
+            setupNodeAsBootstrap();
         }
         else {
             System.out.println("Wrong Option! Exiting.");
@@ -65,10 +68,11 @@ public class Core {
         return HashCash.mintCash(generateRandomString(), 10).toString();
     }
 
-    public static void setupRegularNode(String initialWork) {
+    public static void setupNodeAsRegular(String initialWork) {
         // ask for port to attach itself
         CLIENT_PORT = requestClientPort();
-        client = new KademliaClient(SERVER_ADDRESS,SERVER_PORT);
+        client = new KademliaClient(SERVER_ADDRESS,CLIENT_PORT);
+        //server = new KademliaServer();
 
         // sets an empty routing table.
         client.setRoutingTable(routingTable);
@@ -100,13 +104,25 @@ public class Core {
         //send a FIND_NODE request
         NodeIdMessage f_req = NodeIdMessage.newBuilder().setNodeid(regular_id).setBootstrapnodeid(bootstrap_id).build();
         NodeDetailsListMessage f_res = client.FIND_NODE(f_req);
+        /*THE INITIAL FIND NOTE REQUEST RETURNS 3 NODES NEAR ME. LETS SEND A FIND NODE TO THEM TO POPULATE MY TABLE.*/
+        List<Contact> nearNodes = new LinkedList<>();
+
+        for (NodeDetailsMessage auxMsg : f_res.getNodesList()) {
+            Contact cAux = Contact.fromNodeDetailsMessage(auxMsg);
+            nearNodes.add(cAux);
+            routingTable.addNode(Node.fromNodeDetailsMessage(auxMsg));
+            NodeIdMessage cReq = NodeIdMessage.newBuilder().setNodeid(cAux.nodeID.toString()).setBootstrapnodeid(bootstrap_id).build();
+            NodeDetailsListMessage cRes = client.FIND_NODE(cReq);
+
+        }
 
     }
 
-    public static void setupBootstrapNode() {
+    public static void setupNodeAsBootstrap() {
+        generateBootstrapNode(SERVER_ADDRESS, SERVER_PORT);
         server = new KademliaServer();
         server.setRoutingTable(routingTable);
-        server.generateBootstrapNode(SERVER_ADDRESS, SERVER_PORT);
+
         server.routingTable.setSelfNode(server.self);
         try {
             server.initializeConnection();

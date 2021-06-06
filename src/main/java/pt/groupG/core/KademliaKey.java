@@ -15,6 +15,8 @@ public class KademliaKey {
     }
 
     public KademliaKey() {
+        // TODO
+        //CHANGE TO UUID
         this.key = new byte[MAX_KEY_SIZE/8];
         new Random().nextBytes(this.key);
     }
