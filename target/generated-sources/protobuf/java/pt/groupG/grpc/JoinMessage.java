@@ -17,6 +17,7 @@ private static final long serialVersionUID = 0L;
   }
   private JoinMessage() {
     address_ = "";
+    initialWork_ = "";
   }
 
   @java.lang.Override
@@ -58,6 +59,12 @@ private static final long serialVersionUID = 0L;
           case 16: {
 
             port_ = input.readInt32();
+            break;
+          }
+          case 26: {
+            java.lang.String s = input.readStringRequireUtf8();
+
+            initialWork_ = s;
             break;
           }
           default: {
@@ -135,6 +142,40 @@ private static final long serialVersionUID = 0L;
     return port_;
   }
 
+  public static final int INITIALWORK_FIELD_NUMBER = 3;
+  private volatile java.lang.Object initialWork_;
+  /**
+   * <code>string initialWork = 3;</code>
+   */
+  public java.lang.String getInitialWork() {
+    java.lang.Object ref = initialWork_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      initialWork_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string initialWork = 3;</code>
+   */
+  public com.google.protobuf.ByteString
+      getInitialWorkBytes() {
+    java.lang.Object ref = initialWork_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      initialWork_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -155,6 +196,9 @@ private static final long serialVersionUID = 0L;
     if (port_ != 0) {
       output.writeInt32(2, port_);
     }
+    if (!getInitialWorkBytes().isEmpty()) {
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 3, initialWork_);
+    }
     unknownFields.writeTo(output);
   }
 
@@ -170,6 +214,9 @@ private static final long serialVersionUID = 0L;
     if (port_ != 0) {
       size += com.google.protobuf.CodedOutputStream
         .computeInt32Size(2, port_);
+    }
+    if (!getInitialWorkBytes().isEmpty()) {
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, initialWork_);
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
@@ -190,6 +237,8 @@ private static final long serialVersionUID = 0L;
         .equals(other.getAddress())) return false;
     if (getPort()
         != other.getPort()) return false;
+    if (!getInitialWork()
+        .equals(other.getInitialWork())) return false;
     if (!unknownFields.equals(other.unknownFields)) return false;
     return true;
   }
@@ -205,6 +254,8 @@ private static final long serialVersionUID = 0L;
     hash = (53 * hash) + getAddress().hashCode();
     hash = (37 * hash) + PORT_FIELD_NUMBER;
     hash = (53 * hash) + getPort();
+    hash = (37 * hash) + INITIALWORK_FIELD_NUMBER;
+    hash = (53 * hash) + getInitialWork().hashCode();
     hash = (29 * hash) + unknownFields.hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -342,6 +393,8 @@ private static final long serialVersionUID = 0L;
 
       port_ = 0;
 
+      initialWork_ = "";
+
       return this;
     }
 
@@ -370,6 +423,7 @@ private static final long serialVersionUID = 0L;
       pt.groupG.grpc.JoinMessage result = new pt.groupG.grpc.JoinMessage(this);
       result.address_ = address_;
       result.port_ = port_;
+      result.initialWork_ = initialWork_;
       onBuilt();
       return result;
     }
@@ -424,6 +478,10 @@ private static final long serialVersionUID = 0L;
       }
       if (other.getPort() != 0) {
         setPort(other.getPort());
+      }
+      if (!other.getInitialWork().isEmpty()) {
+        initialWork_ = other.initialWork_;
+        onChanged();
       }
       this.mergeUnknownFields(other.unknownFields);
       onChanged();
@@ -545,6 +603,75 @@ private static final long serialVersionUID = 0L;
     public Builder clearPort() {
       
       port_ = 0;
+      onChanged();
+      return this;
+    }
+
+    private java.lang.Object initialWork_ = "";
+    /**
+     * <code>string initialWork = 3;</code>
+     */
+    public java.lang.String getInitialWork() {
+      java.lang.Object ref = initialWork_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        initialWork_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>string initialWork = 3;</code>
+     */
+    public com.google.protobuf.ByteString
+        getInitialWorkBytes() {
+      java.lang.Object ref = initialWork_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        initialWork_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string initialWork = 3;</code>
+     */
+    public Builder setInitialWork(
+        java.lang.String value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  
+      initialWork_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string initialWork = 3;</code>
+     */
+    public Builder clearInitialWork() {
+      
+      initialWork_ = getDefaultInstance().getInitialWork();
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string initialWork = 3;</code>
+     */
+    public Builder setInitialWorkBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+      
+      initialWork_ = value;
       onChanged();
       return this;
     }

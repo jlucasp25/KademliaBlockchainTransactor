@@ -16,19 +16,14 @@ public class RoutingTable {
      * Therefore the max size of the buckets list is MAX_KEY_SIZE.
      */
 
-    private List<KBucket> buckets = new LinkedList<KBucket>();
+    public List<KBucket> buckets = new LinkedList<KBucket>();
     public Node self;
     public static final int ALPHA_VALUE = 3;
     // buckets cant be bigger than maxBucketsSize
     private static final int maxBucketsSize = KademliaKey.MAX_KEY_SIZE;
-    public KademliaClient client = null;
-
-    public void setClient(KademliaClient client) {
-        this.client = client;
-    }
-
-    public RoutingTable() {
+    public RoutingTable(Node self) {
         // Creates empty buckets.
+        this.self = self;
         for (int i = 0; i < RoutingTable.maxBucketsSize; i++) {
             buckets.add(new KBucket(i));
         }
@@ -255,9 +250,9 @@ public class RoutingTable {
     List<KBucket> fetchClosestNonEmptyBucket(KademliaKey targetKey) {
         int closestDistance = KademliaKey.MAX_KEY_SIZE;
         KBucket closestBucket = null;
-        List<KBucket> orderedBuckets = new LinkedList<>();
+        List<KBucket> orderedBuckets = new LinkedList<KBucket>();
         // copied buckets to not change order of this.buckets.
-        Collections.copy(orderedBuckets, this.buckets);
+        orderedBuckets.addAll(this.buckets);
         // ordered by distance.
         Collections.sort(orderedBuckets, new Comparator<KBucket>() {
             @Override
@@ -295,21 +290,22 @@ public class RoutingTable {
     /*
     * Bootstrap-Side - finds closest nodes to the node that joined and sends to him.
     * */
-    public List<Contact> getClosestNodes(String regular_id, String bootstrap_id) {
+    public List<Contact> getClosestNodes(ByteString regularId, ByteString bootstrapId) {
         Set<Contact> closestNodes = new HashSet<Contact>();
         Set<KademliaKey> contactedNodes = new HashSet<KademliaKey>();
-        List<KBucket> targetKBuckets = fetchClosestNonEmptyBucket(new KademliaKey(regular_id));
+        List<KBucket> targetKBuckets = fetchClosestNonEmptyBucket(new KademliaKey(regularId));
         // for value in buckets list of bootstrap_id
         List<Contact> closestContacts = new LinkedList<>();
 
         for (KBucket auxBucket : targetKBuckets) {
             List<Contact> bucketContacts = new LinkedList<>();
-            Collections.copy(bucketContacts, auxBucket.contacts);
+            bucketContacts.addAll(auxBucket.contacts);
+            bucketContacts.remove(new Contact(new KademliaKey(regularId),"",0));
             Collections.sort(bucketContacts, new Comparator<Contact>() {
                 @Override
                 public int compare(Contact c1, Contact c2) {
-                    int d1 = c1.nodeID.calculateDistance(new KademliaKey(regular_id));
-                    int d2 = c2.nodeID.calculateDistance(new KademliaKey(regular_id));
+                    int d1 = c1.nodeID.calculateDistance(new KademliaKey(regularId));
+                    int d2 = c2.nodeID.calculateDistance(new KademliaKey(regularId));
                     // TODO
                     // improve condition
                     if (d1 == d2) {
@@ -327,6 +323,15 @@ public class RoutingTable {
             }
 
         }
-        return closestContacts.subList(0,2);
+
+        if (closestContacts.size() == 0) {
+            return closestContacts;
+        }
+        else if (closestContacts.size() >= 3) {
+            return closestContacts.subList(0,2);
+        }
+        else {
+            return closestContacts.subList(0, closestContacts.size() - 1);
+        }
     }
 }

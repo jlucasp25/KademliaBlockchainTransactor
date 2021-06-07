@@ -1,24 +1,22 @@
 package pt.groupG.core;
 
 import Utils.HashCash;
+import com.google.protobuf.ByteString;
 import pt.groupG.core.blockchain.Block;
 import pt.groupG.grpc.JoinMessage;
 import pt.groupG.grpc.NodeDetailsListMessage;
 import pt.groupG.grpc.NodeDetailsMessage;
 import pt.groupG.grpc.NodeIdMessage;
 
-import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 import static Utils.StringUtils.generateRandomString;
 
 /**
  * Main/Core class
  * Contains the starting instructions and manages most of the application.
- * */
+ */
 public class Core {
     // Network Properties
     private final static String SERVER_ADDRESS = "localhost";
@@ -26,12 +24,13 @@ public class Core {
     private static int CLIENT_PORT = 8010;
     /*
     KademliaClientRPC must be called as independently like an HTTP request.
-    KademliaBootstrapRPC must be used as a WebSocket, always open for connections.
+    KademliaBootstrapRPC & KademliaClientChannelRPC must be used as a WebSocket, always open for connections.
     */
     private static KademliaBootstrapRPC serverRPC = null;
+    private static KademliaClientChannelRPC clientRPC = null;
 
     // Kademlia Properties
-    public static RoutingTable routingTable = new RoutingTable();
+    public static RoutingTable routingTable = null;
     public static Node selfNode;
 
     // Blockchain Properties
@@ -43,23 +42,14 @@ public class Core {
         System.out.println("Select 1 for regular node, 2 for bootstrap node");
         String s = stdin.next();
         if (s.equals("1")) {
-            String initialWork;
-            try {
-                initialWork = eclipseAttackPrevention();
-            } catch (NoSuchAlgorithmException e) {
-                System.out.println("Initial Work failed. Couldn't enter the network!");
-                return;
-            }
             // send initialWork to bootstrap node for validation
             // only after this validation, can the node join the network
-            setupNodeAsRegular(initialWork);
-        }
-        else if(s.equals("2")) {
+            setupNodeAsRegular();
+        } else if (s.equals("2")) {
             // TODO
             // o bootstrap node tem de ser sempre o mesmo, passar a estatico.
             setupNodeAsBootstrap();
-        }
-        else {
+        } else {
             System.out.println("Wrong Option! Exiting.");
             return;
         }
@@ -67,7 +57,7 @@ public class Core {
 
     /**
      * Generates and sets the self node as a Bootstrap one.
-     * */
+     */
     public static void generateBootstrapNode(String address, int port) {
         KademliaKey kKey = new KademliaKey();
         selfNode = new Node(kKey, address, port);
@@ -75,18 +65,27 @@ public class Core {
 
     /**
      * Forces some computation/work to happen before joining the network
-     * To prevent Eclipse Attack
+     * To prevent Sybil Attack
      */
-    public static String eclipseAttackPrevention() throws NoSuchAlgorithmException {
+    public static String sybilAttackPrevention() throws NoSuchAlgorithmException {
         return HashCash.mintCash(generateRandomString(), 10).toString();
     }
 
     /**
      * Setups the Node as a regular Peer.
      */
-    public static void setupNodeAsRegular(String initialWork) {
+    public static void setupNodeAsRegular() {
         // TEMPORARY: ask for port to attach itself
         CLIENT_PORT = requestClientPort();
+
+        // Generate initial work for POW
+        String initialWork = null;
+        try {
+            initialWork = sybilAttackPrevention();
+        } catch (NoSuchAlgorithmException e) {
+            System.out.println("[Regular Node #NONE] Initial Work failed. Exiting!");
+            return;
+        }
 
         // sends a JOIN request to the Bootstrap Node
         // to get its own key.
@@ -94,8 +93,11 @@ public class Core {
         KademliaClientRPC rpc = new KademliaClientRPC(SERVER_ADDRESS, SERVER_PORT);
         JoinMessage joinReq = JoinMessage.newBuilder().setAddress(SERVER_ADDRESS).setPort(CLIENT_PORT).setInitialWork(initialWork).build();
         NodeIdMessage joinRes = rpc.JOIN(joinReq);
-        String bootstrapNodeKey = joinRes.getBootstrapnodeid();
-        String regularNodeKey = joinRes.getNodeid();
+        ByteString bootstrapNodeKey = joinRes.getBootstrapnodeidBytes();
+        System.out.println("bytestring. - " + bootstrapNodeKey);
+        ByteString regularNodeKey = joinRes.getNodeidBytes();
+        KademliaKey x = new KademliaKey(bootstrapNodeKey);
+        System.out.println("My Key - 0x" + x.toHexaString());
 
         // Checks if the initial work is valid.
         if (bootstrapNodeKey.equals("")) {
@@ -103,33 +105,67 @@ public class Core {
             return;
         }
 
-        // adds the bootstrap node to its routing table.
-        routingTable.addNode(new Node(new KademliaKey(bootstrapNodeKey), SERVER_ADDRESS, SERVER_PORT));
-
         // sets its own node ("self") with the ID provided by the JOIN process.
         setSelfNode(regularNodeKey, SERVER_ADDRESS, CLIENT_PORT);
 
+        // generates empty routing table
+        routingTable = new RoutingTable(selfNode);
+
+        // start regular node connection channel
+        // KademliaClientChannelRPC extends Thread therefore runs in parallel
+        clientRPC = new KademliaClientChannelRPC(SERVER_ADDRESS, CLIENT_PORT, routingTable, selfNode);
+        clientRPC.start();
+
+        // adds the bootstrap node to its routing table.
+        routingTable.addNode(new Node(new KademliaKey(bootstrapNodeKey), SERVER_ADDRESS, SERVER_PORT));
+
+
+
         // send a FIND_NODE request to the bootstrap node
         // so that it finds the closest 3 nodes to itself.
-        System.out.println("[Regular Node 0x" + selfNode.nodeID.toHexaString() + "] - Sending Join Request...");
+        System.out.println("[Regular Node] - Sending Find Node Request to bootstrap.");
         rpc = new KademliaClientRPC(SERVER_ADDRESS, SERVER_PORT);
-        NodeIdMessage findNodeReq = NodeIdMessage.newBuilder().setNodeid(regularNodeKey).setBootstrapnodeid(bootstrapNodeKey).build();
+        NodeDetailsMessage findNodeReq = NodeDetailsMessage.newBuilder().setNodeidBytes(regularNodeKey).setAddress(SERVER_ADDRESS).setPort(CLIENT_PORT).setBootstrapnodeidBytes(bootstrapNodeKey).build();
         NodeDetailsListMessage findNodeRes = rpc.FIND_NODE(findNodeReq);
 
         // Lets add the closest nodes to my routing table
         // and send FIND_NODE's to them to populate my table and theirs.
-        List<Contact> nearNodes = new LinkedList<Contact>();
-
+        Set<Contact> totalNearNodes = new HashSet<>();
+        Set<Contact> contactedNodes = new HashSet<Contact>();
         for (NodeDetailsMessage auxMsg : findNodeRes.getNodesList()) {
-            Contact cAux = Contact.fromNodeDetailsMessage(auxMsg);
-            nearNodes.add(cAux);
-            routingTable.addNode(Node.fromNodeDetailsMessage(auxMsg));
+            totalNearNodes.add(Contact.fromNodeDetailsMessage(auxMsg));
+        }
+
+        for (Contact nearNode : totalNearNodes) {
+            System.out.println("[FIND_NODE result (from bootstrap)] 0x" + nearNode.nodeID.toHexaString());
+            // add this Node to my routing table.
+            routingTable.addNode(Node.fromContact(nearNode));
+
+            // lets add the node to the contacted ones.
+            contactedNodes.add(nearNode);
+
             // lets send a find node to the closest node, so the address and port are extracted from the contact. :)
-            rpc = new KademliaClientRPC(cAux.getAddress(), cAux.getPort());
-            // which is the regular key here? ours or the node's one?
-            NodeIdMessage cReq = NodeIdMessage.newBuilder().setNodeid(cAux.nodeID.toString()).setBootstrapnodeid(bootstrap_id).build();
+            System.out.println("[Regular Node] - Sending Find Node Request to 0x" + nearNode.nodeID.toHexaString());
+            rpc = new KademliaClientRPC(nearNode.getAddress(), nearNode.getPort());
+            NodeDetailsMessage cReq = NodeDetailsMessage.newBuilder().setNodeidBytes(ByteString.copyFrom(selfNode.nodeID.byteKey)).setAddress(SERVER_ADDRESS).setPort(CLIENT_PORT).setBootstrapnodeidBytes(bootstrapNodeKey).build();
             NodeDetailsListMessage cRes = rpc.FIND_NODE(cReq);
 
+            // lets check the new near nodes.
+            for (NodeDetailsMessage aux : cRes.getNodesList()) {
+                Contact cAux = Contact.fromNodeDetailsMessage(aux);
+                System.out.println("[FIND_NODE result (from regular node) 0x" + cAux.nodeID.toHexaString());
+                // if this node is new aka hasnt been contacted, add it to the set.
+                // if the node hasnt been contacted but its a repeat, it wont be added because its a set.
+                if (!contactedNodes.contains(cAux)) {
+                    totalNearNodes.add(cAux);
+                }
+            }
+            // lets remove the current node from the list.
+            totalNearNodes.remove(nearNode);
+
+            // if the size is 0, theres nothing to do : break
+            if (totalNearNodes.size() == 0)
+                break;
         }
 
     }
@@ -139,15 +175,16 @@ public class Core {
      */
     public static void setupNodeAsBootstrap() {
         generateBootstrapNode(SERVER_ADDRESS, SERVER_PORT);
-        serverRPC = new KademliaBootstrapRPC(SERVER_ADDRESS, SERVER_PORT);
+        routingTable = new RoutingTable(selfNode);
+        serverRPC = new KademliaBootstrapRPC(SERVER_ADDRESS, SERVER_PORT, routingTable, selfNode);
         serverRPC.initializeConnection();
         serverRPC.openConnectionChannel();
     }
 
     /**
      * Sets self node using a string key, address and port.
-     * */
-    public static void setSelfNode(String key, String address, int port) {
+     */
+    public static void setSelfNode(ByteString key, String address, int port) {
         KademliaKey kKey = new KademliaKey(key);
         selfNode = new Node(kKey, address, port);
     }

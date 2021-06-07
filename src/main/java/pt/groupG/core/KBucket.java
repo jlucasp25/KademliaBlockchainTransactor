@@ -33,8 +33,6 @@ public class KBucket {
 
     /**
      * Returns true if the k-bucket is empty.
-     *
-     * @return
      */
     public boolean isEmpty() {
         return this.contacts.isEmpty();

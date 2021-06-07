@@ -89,27 +89,27 @@ public final class ServerServiceGrpc {
     return getPingMethod;
   }
 
-  private static volatile io.grpc.MethodDescriptor<pt.groupG.grpc.NodeIdMessage,
+  private static volatile io.grpc.MethodDescriptor<pt.groupG.grpc.NodeDetailsMessage,
       pt.groupG.grpc.NodeDetailsListMessage> getFindNodeMethod;
 
   @io.grpc.stub.annotations.RpcMethod(
       fullMethodName = SERVICE_NAME + '/' + "findNode",
-      requestType = pt.groupG.grpc.NodeIdMessage.class,
+      requestType = pt.groupG.grpc.NodeDetailsMessage.class,
       responseType = pt.groupG.grpc.NodeDetailsListMessage.class,
       methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
-  public static io.grpc.MethodDescriptor<pt.groupG.grpc.NodeIdMessage,
+  public static io.grpc.MethodDescriptor<pt.groupG.grpc.NodeDetailsMessage,
       pt.groupG.grpc.NodeDetailsListMessage> getFindNodeMethod() {
-    io.grpc.MethodDescriptor<pt.groupG.grpc.NodeIdMessage, pt.groupG.grpc.NodeDetailsListMessage> getFindNodeMethod;
+    io.grpc.MethodDescriptor<pt.groupG.grpc.NodeDetailsMessage, pt.groupG.grpc.NodeDetailsListMessage> getFindNodeMethod;
     if ((getFindNodeMethod = ServerServiceGrpc.getFindNodeMethod) == null) {
       synchronized (ServerServiceGrpc.class) {
         if ((getFindNodeMethod = ServerServiceGrpc.getFindNodeMethod) == null) {
           ServerServiceGrpc.getFindNodeMethod = getFindNodeMethod =
-              io.grpc.MethodDescriptor.<pt.groupG.grpc.NodeIdMessage, pt.groupG.grpc.NodeDetailsListMessage>newBuilder()
+              io.grpc.MethodDescriptor.<pt.groupG.grpc.NodeDetailsMessage, pt.groupG.grpc.NodeDetailsListMessage>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
               .setFullMethodName(generateFullMethodName(SERVICE_NAME, "findNode"))
               .setSampledToLocalTracing(true)
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  pt.groupG.grpc.NodeIdMessage.getDefaultInstance()))
+                  pt.groupG.grpc.NodeDetailsMessage.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
                   pt.groupG.grpc.NodeDetailsListMessage.getDefaultInstance()))
               .setSchemaDescriptor(new ServerServiceMethodDescriptorSupplier("findNode"))
@@ -120,27 +120,27 @@ public final class ServerServiceGrpc {
     return getFindNodeMethod;
   }
 
-  private static volatile io.grpc.MethodDescriptor<pt.groupG.grpc.NodeIdMessage,
+  private static volatile io.grpc.MethodDescriptor<pt.groupG.grpc.NodeDetailsMessage,
       pt.groupG.grpc.NodeDetailsListMessage> getFindValueMethod;
 
   @io.grpc.stub.annotations.RpcMethod(
       fullMethodName = SERVICE_NAME + '/' + "findValue",
-      requestType = pt.groupG.grpc.NodeIdMessage.class,
+      requestType = pt.groupG.grpc.NodeDetailsMessage.class,
       responseType = pt.groupG.grpc.NodeDetailsListMessage.class,
       methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
-  public static io.grpc.MethodDescriptor<pt.groupG.grpc.NodeIdMessage,
+  public static io.grpc.MethodDescriptor<pt.groupG.grpc.NodeDetailsMessage,
       pt.groupG.grpc.NodeDetailsListMessage> getFindValueMethod() {
-    io.grpc.MethodDescriptor<pt.groupG.grpc.NodeIdMessage, pt.groupG.grpc.NodeDetailsListMessage> getFindValueMethod;
+    io.grpc.MethodDescriptor<pt.groupG.grpc.NodeDetailsMessage, pt.groupG.grpc.NodeDetailsListMessage> getFindValueMethod;
     if ((getFindValueMethod = ServerServiceGrpc.getFindValueMethod) == null) {
       synchronized (ServerServiceGrpc.class) {
         if ((getFindValueMethod = ServerServiceGrpc.getFindValueMethod) == null) {
           ServerServiceGrpc.getFindValueMethod = getFindValueMethod =
-              io.grpc.MethodDescriptor.<pt.groupG.grpc.NodeIdMessage, pt.groupG.grpc.NodeDetailsListMessage>newBuilder()
+              io.grpc.MethodDescriptor.<pt.groupG.grpc.NodeDetailsMessage, pt.groupG.grpc.NodeDetailsListMessage>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
               .setFullMethodName(generateFullMethodName(SERVICE_NAME, "findValue"))
               .setSampledToLocalTracing(true)
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  pt.groupG.grpc.NodeIdMessage.getDefaultInstance()))
+                  pt.groupG.grpc.NodeDetailsMessage.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
                   pt.groupG.grpc.NodeDetailsListMessage.getDefaultInstance()))
               .setSchemaDescriptor(new ServerServiceMethodDescriptorSupplier("findValue"))
@@ -194,14 +194,14 @@ public final class ServerServiceGrpc {
 
     /**
      */
-    public void findNode(pt.groupG.grpc.NodeIdMessage request,
+    public void findNode(pt.groupG.grpc.NodeDetailsMessage request,
         io.grpc.stub.StreamObserver<pt.groupG.grpc.NodeDetailsListMessage> responseObserver) {
       asyncUnimplementedUnaryCall(getFindNodeMethod(), responseObserver);
     }
 
     /**
      */
-    public void findValue(pt.groupG.grpc.NodeIdMessage request,
+    public void findValue(pt.groupG.grpc.NodeDetailsMessage request,
         io.grpc.stub.StreamObserver<pt.groupG.grpc.NodeDetailsListMessage> responseObserver) {
       asyncUnimplementedUnaryCall(getFindValueMethod(), responseObserver);
     }
@@ -226,14 +226,14 @@ public final class ServerServiceGrpc {
             getFindNodeMethod(),
             asyncUnaryCall(
               new MethodHandlers<
-                pt.groupG.grpc.NodeIdMessage,
+                pt.groupG.grpc.NodeDetailsMessage,
                 pt.groupG.grpc.NodeDetailsListMessage>(
                   this, METHODID_FIND_NODE)))
           .addMethod(
             getFindValueMethod(),
             asyncUnaryCall(
               new MethodHandlers<
-                pt.groupG.grpc.NodeIdMessage,
+                pt.groupG.grpc.NodeDetailsMessage,
                 pt.groupG.grpc.NodeDetailsListMessage>(
                   this, METHODID_FIND_VALUE)))
           .build();
@@ -276,7 +276,7 @@ public final class ServerServiceGrpc {
 
     /**
      */
-    public void findNode(pt.groupG.grpc.NodeIdMessage request,
+    public void findNode(pt.groupG.grpc.NodeDetailsMessage request,
         io.grpc.stub.StreamObserver<pt.groupG.grpc.NodeDetailsListMessage> responseObserver) {
       asyncUnaryCall(
           getChannel().newCall(getFindNodeMethod(), getCallOptions()), request, responseObserver);
@@ -284,7 +284,7 @@ public final class ServerServiceGrpc {
 
     /**
      */
-    public void findValue(pt.groupG.grpc.NodeIdMessage request,
+    public void findValue(pt.groupG.grpc.NodeDetailsMessage request,
         io.grpc.stub.StreamObserver<pt.groupG.grpc.NodeDetailsListMessage> responseObserver) {
       asyncUnaryCall(
           getChannel().newCall(getFindValueMethod(), getCallOptions()), request, responseObserver);
@@ -325,14 +325,14 @@ public final class ServerServiceGrpc {
 
     /**
      */
-    public pt.groupG.grpc.NodeDetailsListMessage findNode(pt.groupG.grpc.NodeIdMessage request) {
+    public pt.groupG.grpc.NodeDetailsListMessage findNode(pt.groupG.grpc.NodeDetailsMessage request) {
       return blockingUnaryCall(
           getChannel(), getFindNodeMethod(), getCallOptions(), request);
     }
 
     /**
      */
-    public pt.groupG.grpc.NodeDetailsListMessage findValue(pt.groupG.grpc.NodeIdMessage request) {
+    public pt.groupG.grpc.NodeDetailsListMessage findValue(pt.groupG.grpc.NodeDetailsMessage request) {
       return blockingUnaryCall(
           getChannel(), getFindValueMethod(), getCallOptions(), request);
     }
@@ -375,7 +375,7 @@ public final class ServerServiceGrpc {
     /**
      */
     public com.google.common.util.concurrent.ListenableFuture<pt.groupG.grpc.NodeDetailsListMessage> findNode(
-        pt.groupG.grpc.NodeIdMessage request) {
+        pt.groupG.grpc.NodeDetailsMessage request) {
       return futureUnaryCall(
           getChannel().newCall(getFindNodeMethod(), getCallOptions()), request);
     }
@@ -383,7 +383,7 @@ public final class ServerServiceGrpc {
     /**
      */
     public com.google.common.util.concurrent.ListenableFuture<pt.groupG.grpc.NodeDetailsListMessage> findValue(
-        pt.groupG.grpc.NodeIdMessage request) {
+        pt.groupG.grpc.NodeDetailsMessage request) {
       return futureUnaryCall(
           getChannel().newCall(getFindValueMethod(), getCallOptions()), request);
     }
@@ -420,11 +420,11 @@ public final class ServerServiceGrpc {
               (io.grpc.stub.StreamObserver<pt.groupG.grpc.BooleanMessage>) responseObserver);
           break;
         case METHODID_FIND_NODE:
-          serviceImpl.findNode((pt.groupG.grpc.NodeIdMessage) request,
+          serviceImpl.findNode((pt.groupG.grpc.NodeDetailsMessage) request,
               (io.grpc.stub.StreamObserver<pt.groupG.grpc.NodeDetailsListMessage>) responseObserver);
           break;
         case METHODID_FIND_VALUE:
-          serviceImpl.findValue((pt.groupG.grpc.NodeIdMessage) request,
+          serviceImpl.findValue((pt.groupG.grpc.NodeDetailsMessage) request,
               (io.grpc.stub.StreamObserver<pt.groupG.grpc.NodeDetailsListMessage>) responseObserver);
           break;
         default:

@@ -6,8 +6,8 @@ option java_outer_classname = "ServerProtos";
 service ServerService {
   rpc join (JoinMessage) returns (NodeIdMessage);
   rpc ping (EmptyMessage) returns (BooleanMessage);
-  rpc findNode (NodeIdMessage) returns (NodeDetailsListMessage);
-  rpc findValue (NodeIdMessage) returns (NodeDetailsListMessage);
+  rpc findNode (NodeDetailsMessage) returns (NodeDetailsListMessage);
+  rpc findValue (NodeDetailsMessage) returns (NodeDetailsListMessage);
 }
 
 message JoinMessage {
@@ -28,6 +28,7 @@ message NodeDetailsMessage {
   string address = 1;
   int32 port = 2;
   string nodeid = 3;
+  string bootstrapnodeid = 4;
 }
 
 message NodeDetailsListMessage {

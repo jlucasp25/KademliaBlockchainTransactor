@@ -13,6 +13,10 @@ public class Contact extends Node {
         super(nodeID, address, port);
     }
 
+    public String toString() {
+        return "[Contact] 0x" + nodeID.toHexaString();
+    }
+
     /**
      * Factory Constructor for Contacts using Node.
      */
@@ -21,8 +25,7 @@ public class Contact extends Node {
     }
 
     public static Contact fromNodeDetailsMessage(NodeDetailsMessage msg) {
-        /*CASTS STRING TO BYTES[]; Maybe protobuf needs to be changed to bytes.*/
-        KademliaKey kdk = new KademliaKey(msg.getNodeid().getBytes(StandardCharsets.UTF_8));
+        KademliaKey kdk = new KademliaKey(msg.getNodeidBytes());
         return new Contact(kdk, msg.getAddress(), msg.getPort());
     }
 

@@ -6,6 +6,7 @@ pt/groupG/grpc/ServerServiceGrpc$ServerServiceFutureStub.class
 pt/groupG/grpc/EmptyMessage.class
 pt/groupG/grpc/ServerServiceGrpc$ServerServiceImplBase.class
 pt/groupG/grpc/NodeIdMessage.class
+pt/groupG/core/KademliaBootstrapRPC$ServerServiceImpl.class
 pt/groupG/grpc/ServerProtos.class
 pt/groupG/grpc/EmptyMessage$Builder.class
 pt/groupG/grpc/JoinMessage.class
@@ -14,7 +15,6 @@ pt/groupG/grpc/NodeDetailsListMessageOrBuilder.class
 pt/groupG/grpc/BooleanMessageOrBuilder.class
 pt/groupG/grpc/ServerServiceGrpc$ServerServiceStub.class
 pt/groupG/grpc/NodeDetailsMessage.class
-pt/groupG/core/KademliaServer.class
 pt/groupG/grpc/NodeDetailsListMessage$Builder.class
 pt/groupG/grpc/NodeIdListMessage.class
 pt/groupG/grpc/NodeIdListMessageOrBuilder.class
@@ -23,6 +23,9 @@ pt/groupG/grpc/ServerServiceGrpc$ServerServiceFileDescriptorSupplier.class
 pt/groupG/grpc/JoinMessage$1.class
 pt/groupG/grpc/EmptyMessageOrBuilder.class
 pt/groupG/grpc/ServerServiceGrpc$ServerServiceMethodDescriptorSupplier.class
+pt/groupG/core/KademliaClientChannelRPC$ServerServiceImpl.class
+pt/groupG/core/KademliaClientRPC.class
+pt/groupG/core/RoutingTable$1.class
 pt/groupG/grpc/JoinMessage$Builder.class
 pt/groupG/grpc/BooleanMessage$Builder.class
 pt/groupG/grpc/ServerServiceGrpc.class
@@ -30,12 +33,16 @@ pt/groupG/grpc/ServerServiceGrpc$ServerServiceBaseDescriptorSupplier.class
 pt/groupG/grpc/BooleanMessage$1.class
 pt/groupG/core/Core.class
 pt/groupG/grpc/NodeIdMessage$Builder.class
+Utils/StringUtils.class
 pt/groupG/grpc/NodeIdMessageOrBuilder.class
+pt/groupG/core/KademliaBootstrapRPC.class
+pt/groupG/core/RoutingTable$2.class
 pt/groupG/grpc/ServerServiceGrpc$ServerServiceBlockingStub.class
-pt/groupG/core/KademliaClient.class
 pt/groupG/grpc/NodeDetailsMessageOrBuilder.class
 pt/groupG/grpc/NodeDetailsListMessage.class
+pt/groupG/core/KademliaClientChannelRPC.class
 pt/groupG/grpc/ServerServiceGrpc$MethodHandlers.class
 pt/groupG/grpc/NodeIdListMessage$Builder.class
 pt/groupG/grpc/NodeDetailsMessage$Builder.class
+Utils/HashCash.class
 pt/groupG/grpc/NodeDetailsMessage$1.class

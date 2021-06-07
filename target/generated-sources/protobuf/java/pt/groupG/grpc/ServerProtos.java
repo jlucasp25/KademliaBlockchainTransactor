@@ -58,25 +58,27 @@ public final class ServerProtos {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\021ServerProto.proto\022\016pt.groupG.grpc\",\n\013J" +
+      "\n\021ServerProto.proto\022\016pt.groupG.grpc\"A\n\013J" +
       "oinMessage\022\017\n\007address\030\001 \001(\t\022\014\n\004port\030\002 \001(" +
-      "\005\"\037\n\016BooleanMessage\022\r\n\005value\030\001 \001(\010\"\016\n\014Em" +
-      "ptyMessage\"C\n\022NodeDetailsMessage\022\017\n\007addr" +
-      "ess\030\001 \001(\t\022\014\n\004port\030\002 \001(\005\022\016\n\006nodeid\030\003 \001(\t\"" +
-      "K\n\026NodeDetailsListMessage\0221\n\005nodes\030\001 \003(\013" +
-      "2\".pt.groupG.grpc.NodeDetailsMessage\"8\n\r" +
-      "NodeIdMessage\022\016\n\006nodeid\030\001 \001(\t\022\027\n\017bootstr" +
-      "apnodeid\030\002 \001(\t\"A\n\021NodeIdListMessage\022,\n\005n" +
-      "odes\030\001 \003(\0132\035.pt.groupG.grpc.NodeIdMessag" +
-      "e2\300\002\n\rServerService\022B\n\004join\022\033.pt.groupG." +
-      "grpc.JoinMessage\032\035.pt.groupG.grpc.NodeId" +
-      "Message\022D\n\004ping\022\034.pt.groupG.grpc.EmptyMe" +
-      "ssage\032\036.pt.groupG.grpc.BooleanMessage\022Q\n" +
-      "\010findNode\022\035.pt.groupG.grpc.NodeIdMessage" +
-      "\032&.pt.groupG.grpc.NodeDetailsListMessage" +
-      "\022R\n\tfindValue\022\035.pt.groupG.grpc.NodeIdMes" +
-      "sage\032&.pt.groupG.grpc.NodeDetailsListMes" +
-      "sageB\020B\014ServerProtosP\001b\006proto3"
+      "\005\022\023\n\013initialWork\030\003 \001(\t\"\037\n\016BooleanMessage" +
+      "\022\r\n\005value\030\001 \001(\010\"\016\n\014EmptyMessage\"\\\n\022NodeD" +
+      "etailsMessage\022\017\n\007address\030\001 \001(\t\022\014\n\004port\030\002" +
+      " \001(\005\022\016\n\006nodeid\030\003 \001(\t\022\027\n\017bootstrapnodeid\030" +
+      "\004 \001(\t\"K\n\026NodeDetailsListMessage\0221\n\005nodes" +
+      "\030\001 \003(\0132\".pt.groupG.grpc.NodeDetailsMessa" +
+      "ge\"8\n\rNodeIdMessage\022\016\n\006nodeid\030\001 \001(\t\022\027\n\017b" +
+      "ootstrapnodeid\030\002 \001(\t\"A\n\021NodeIdListMessag" +
+      "e\022,\n\005nodes\030\001 \003(\0132\035.pt.groupG.grpc.NodeId" +
+      "Message2\312\002\n\rServerService\022B\n\004join\022\033.pt.g" +
+      "roupG.grpc.JoinMessage\032\035.pt.groupG.grpc." +
+      "NodeIdMessage\022D\n\004ping\022\034.pt.groupG.grpc.E" +
+      "mptyMessage\032\036.pt.groupG.grpc.BooleanMess" +
+      "age\022V\n\010findNode\022\".pt.groupG.grpc.NodeDet" +
+      "ailsMessage\032&.pt.groupG.grpc.NodeDetails" +
+      "ListMessage\022W\n\tfindValue\022\".pt.groupG.grp" +
+      "c.NodeDetailsMessage\032&.pt.groupG.grpc.No" +
+      "deDetailsListMessageB\020B\014ServerProtosP\001b\006" +
+      "proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -87,7 +89,7 @@ public final class ServerProtos {
     internal_static_pt_groupG_grpc_JoinMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_pt_groupG_grpc_JoinMessage_descriptor,
-        new java.lang.String[] { "Address", "Port", });
+        new java.lang.String[] { "Address", "Port", "InitialWork", });
     internal_static_pt_groupG_grpc_BooleanMessage_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_pt_groupG_grpc_BooleanMessage_fieldAccessorTable = new
@@ -105,7 +107,7 @@ public final class ServerProtos {
     internal_static_pt_groupG_grpc_NodeDetailsMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_pt_groupG_grpc_NodeDetailsMessage_descriptor,
-        new java.lang.String[] { "Address", "Port", "Nodeid", });
+        new java.lang.String[] { "Address", "Port", "Nodeid", "Bootstrapnodeid", });
     internal_static_pt_groupG_grpc_NodeDetailsListMessage_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_pt_groupG_grpc_NodeDetailsListMessage_fieldAccessorTable = new

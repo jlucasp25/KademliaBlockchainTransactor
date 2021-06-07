@@ -1,6 +1,7 @@
 package pt.groupG.core;
 
 import Utils.HashCash;
+import com.google.protobuf.ByteString;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
@@ -19,10 +20,15 @@ public class KademliaBootstrapRPC {
     private Server server;
     private int serverPort = 0;
     private String serverHost = "";
+    // References to Core
+    RoutingTable selfTable = null;
+    Node selfNode = null;
 
-    public KademliaBootstrapRPC(String host, int port) {
+    public KademliaBootstrapRPC(String host, int port, RoutingTable table, Node nd) {
         this.serverHost = host;
         this.serverPort = port;
+        this.selfTable = table;
+        this.selfNode = nd;
     }
 
     /**
@@ -50,8 +56,7 @@ public class KademliaBootstrapRPC {
                 System.out.println("[KademliaBootstrapRPC] Open for connections!");
                 server.awaitTermination();
             }
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             System.out.println("[KademliaBootstrapRPC] Execution Interrupted!");
         }
     }
@@ -61,46 +66,62 @@ public class KademliaBootstrapRPC {
      */
     class ServerServiceImpl extends ServerServiceGrpc.ServerServiceImplBase {
 
+        /**
+         * PING RPC Response Handler
+         */
         public void ping(EmptyMessage req, StreamObserver<BooleanMessage> res) {
             System.out.println("[ServerService] Received PING");
             res.onNext(BooleanMessage.newBuilder().setValue(true).build());
             res.onCompleted();
         }
 
+        /**
+         * JOIN RPC Response Handler
+         */
         public void join(JoinMessage req, StreamObserver<NodeIdMessage> res) {
             System.out.println("[ServerService] Received JOIN");
+            HashCash initialWorkHC = null;
 
-            /*
-            validate received initial work
-             */
-            NodeIdMessage.Builder msgBuilder = NodeIdMessage.newBuilder();
+            // validate initial work.
             try {
                 String initialWork = req.getInitialWork();
-                new HashCash(initialWork);
-            } catch (Exception ignored) {
-                System.out.println("Captured invalid initial work.");
-                res.onNext(msgBuilder.build());
+                initialWorkHC = new HashCash(initialWork);
+            } catch (Exception e) {
+                System.out.println("[ServerService] Generated Invalid Initial Work! (Sending empty message)");
+                res.onNext(NodeIdMessage.newBuilder().build());
                 res.onCompleted();
                 return;
             }
 
             System.out.println("[ServerService] Generating key for joined node.");
             KademliaKey key = new KademliaKey();
-            NodeIdMessage msg = msgBuilder.setNodeid(key.toString()).setBootstrapnodeid(self.nodeID.toString()).build();
-            routingTable.addNode(new Node(key, req.getAddress(), req.getPort()));
-            System.out.println(routingTable);
+            NodeIdMessage msg = NodeIdMessage.newBuilder().setNodeidBytes(ByteString.copyFrom(key.byteKey)).setBootstrapnodeidBytes(ByteString.copyFrom(selfNode.nodeID.byteKey)).build();
+
+            // add created node to routing table.
+            selfTable.addNode(new Node(key, req.getAddress(), req.getPort()));
+
             res.onNext(msg);
             res.onCompleted();
         }
-
-        public void findNode(NodeIdMessage req, StreamObserver<NodeDetailsListMessage> res) {
+        /**
+         * FIND-NODE RPC Response Handler
+         */
+        public void findNode(NodeDetailsMessage req, StreamObserver<NodeDetailsListMessage> res) {
             System.out.println("[ServerService] Received FIND_NODE");
-            System.out.println("[ServerService] Searching for closests nodes to " + req.getNodeid());
+
+            System.out.println("[ServerService] Added request origin node to routing table!");
+            selfTable.addNode(new Node(new KademliaKey(req.getNodeidBytes()),req.getAddress(), req.getPort()));
+
+            System.out.println("[ServerService] Searching for closest nodes to " + new KademliaKey(req.getNodeidBytes()).toHexaString());
+
             List<NodeDetailsMessage> nodes = new LinkedList<>();
-            List<Contact> closestNodes = routingTable.getClosestNodes(req.getNodeid(), req.getBootstrapnodeid());
+
+            List<Contact> closestNodes = selfTable.getClosestNodes(req.getNodeidBytes(), req.getBootstrapnodeidBytes());
+
             for (Contact aux : closestNodes) {
-                nodes.add(NodeDetailsMessage.newBuilder().setNodeid(aux.nodeID.toString()).setAddress(aux.getAddress()).setPort(aux.getPort()).build());
+                nodes.add(NodeDetailsMessage.newBuilder().setNodeidBytes(ByteString.copyFrom(aux.nodeID.byteKey)).setAddress(aux.getAddress()).setPort(aux.getPort()).build());
             }
+
             NodeDetailsListMessage msg = NodeDetailsListMessage.newBuilder().addAllNodes(nodes).build();
             res.onNext(msg);
             res.onCompleted();

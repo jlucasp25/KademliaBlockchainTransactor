@@ -31,4 +31,14 @@ public interface NodeDetailsMessageOrBuilder extends
    */
   com.google.protobuf.ByteString
       getNodeidBytes();
+
+  /**
+   * <code>string bootstrapnodeid = 4;</code>
+   */
+  java.lang.String getBootstrapnodeid();
+  /**
+   * <code>string bootstrapnodeid = 4;</code>
+   */
+  com.google.protobuf.ByteString
+      getBootstrapnodeidBytes();
 }

@@ -21,4 +21,14 @@ public interface JoinMessageOrBuilder extends
    * <code>int32 port = 2;</code>
    */
   int getPort();
+
+  /**
+   * <code>string initialWork = 3;</code>
+   */
+  java.lang.String getInitialWork();
+  /**
+   * <code>string initialWork = 3;</code>
+   */
+  com.google.protobuf.ByteString
+      getInitialWorkBytes();
 }

@@ -1,33 +1,44 @@
 package pt.groupG.core;
 
+import com.google.protobuf.ByteString;
+
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Random;
+import java.util.UUID;
 
 
 public class KademliaKey {
     public static final boolean DEBUG = false;
 
     public final static int MAX_KEY_SIZE = 256;
-    private byte[] key;
-    private String hash;
+    UUID key;
+    public byte[] byteKey;
+    private String strKey;
 
     public byte[] getKey() {
-        return this.key;
+        return this.byteKey;
     }
 
     public KademliaKey() {
-        // TODO
-        //CHANGE TO UUID
-        this.key = new byte[MAX_KEY_SIZE/8];
-        new Random().nextBytes(this.key);
+        this.key = UUID.randomUUID();
+        this.strKey = this.key.toString();
+        this.byteKey = this.strKey.getBytes(StandardCharsets.UTF_8);
+        this.byteKey = Arrays.copyOfRange(this.byteKey, 0, MAX_KEY_SIZE/8);
     }
 
     public KademliaKey(byte[] key) {
-        this.key = key;
+        this.byteKey = key;
     }
 
-    public KademliaKey(String key) {
-       this.key = getByteByString(key);
+//    public KademliaKey(String key) {
+//        this.strKey = this.key.toString();
+//        this.byteKey = this.strKey.getBytes(StandardCharsets.UTF_8);
+//        this.byteKey = Arrays.copyOfRange(this.byteKey, 0, MAX_KEY_SIZE/8);
+//    }
+
+    public KademliaKey(ByteString key) {
+        this.byteKey = key.toByteArray();
     }
 
     /**
@@ -52,7 +63,7 @@ public class KademliaKey {
         byte[] result = new byte[MAX_KEY_SIZE/8];
         byte[] auxBytes = aux.getKey();
         for (int i = 0; i < (MAX_KEY_SIZE/8); i++) {
-            result[i] = (byte) (this.key[i] ^ auxBytes[i]);
+            result[i] = (byte) (this.byteKey[i] ^ auxBytes[i]);
         }
         return new KademliaKey(result);
     }
@@ -68,7 +79,7 @@ public class KademliaKey {
     public int getFirstBitOn() {
         int prefix = 0;
 
-        for (byte aux : this.key) {
+        for (byte aux : this.byteKey) {
             if (aux == 0) {
                 prefix += 8;
             }
@@ -108,7 +119,7 @@ public class KademliaKey {
     public boolean checkRange(KademliaKey k) {
         /* errado - é preciso ver bit a bit em vez de byte a byte.*/
         for (int i = 0; i < MAX_KEY_SIZE ; i++) {
-            if (this.key[i] != k.key[i]) {
+            if (this.byteKey[i] != k.byteKey[i]) {
                 return false;
             }
         }
@@ -121,9 +132,9 @@ public class KademliaKey {
      */
     public boolean equals(KademliaKey aux) {
 
-        for (int i = 0; i < this.key.length; i++) {
-            String thisBit = Integer.toBinaryString((this.key[i] & 0xFF) + 0x100).substring(1);
-            String auxBit = Integer.toBinaryString((aux.key[i] & 0xFF) + 0x100).substring(1);
+        for (int i = 0; i < this.byteKey.length; i++) {
+            String thisBit = Integer.toBinaryString((this.byteKey[i] & 0xFF) + 0x100).substring(1);
+            String auxBit = Integer.toBinaryString((aux.byteKey[i] & 0xFF) + 0x100).substring(1);
             if (!thisBit.equals(auxBit)) {
                 return false;
             }
@@ -135,19 +146,26 @@ public class KademliaKey {
      *      * -- WORKING --
      *
      */
+    @Override
     public String toString() {
         String str = "";
-        for (byte b : this.key) {
+        for (byte b : this.byteKey) {
             str += Integer.toBinaryString((b & 0xFF) + 0x100).substring(1);
         }
-        if (DEBUG)
-            System.out.println( "Key Size -> " + str.length());
         return str;
     }
 
     public String toHexaString() {
-        return bytesToHex(this.key);
+        return bytesToHex(this.byteKey);
     }
+
+    public static String byteArrayToHex(byte[] a) {
+        StringBuilder sb = new StringBuilder(a.length * 2);
+        for(byte b: a)
+            sb.append(String.format("%02x", b));
+        return sb.toString();
+    }
+
 
     /**
      * External function to convert byte[] into Hexadecimal Strings.

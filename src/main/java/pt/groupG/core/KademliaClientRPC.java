@@ -52,7 +52,7 @@ public class KademliaClientRPC {
         return res;
     }
 
-    public NodeDetailsListMessage FIND_NODE(NodeIdMessage req) {
+    public NodeDetailsListMessage FIND_NODE(NodeDetailsMessage req) {
         System.out.println("[Client RPC]: Sent FIND_NODE");
         NodeDetailsListMessage res = null;
         res = this.stub.findNode(req);
@@ -66,7 +66,7 @@ public class KademliaClientRPC {
         return res;
     }
 
-    public List<Node> FIND_VALUE(NodeIdMessage req) {
+    public List<Node> FIND_VALUE(NodeDetailsMessage req) {
         NodeDetailsListMessage res = null;
         res = stub.findValue(req);
         /*placeholder*/
