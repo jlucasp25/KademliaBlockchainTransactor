@@ -26,7 +26,7 @@ public class Core {
     KademliaClientRPC must be called as independently like an HTTP request.
     KademliaBootstrapRPC & KademliaClientChannelRPC must be used as a WebSocket, always open for connections.
     */
-    private static KademliaBootstrapRPC serverRPC = null;
+    private static KademliaBootstrapChannelRPC serverRPC = null;
     private static KademliaClientChannelRPC clientRPC = null;
 
     // Kademlia Properties
@@ -60,6 +60,7 @@ public class Core {
      */
     public static void generateBootstrapNode(String address, int port) {
         KademliaKey kKey = new KademliaKey();
+        System.out.println("[Bootstrap Key] 0x" + kKey.toHexaString());
         selfNode = new Node(kKey, address, port);
     }
 
@@ -94,10 +95,8 @@ public class Core {
         JoinMessage joinReq = JoinMessage.newBuilder().setAddress(SERVER_ADDRESS).setPort(CLIENT_PORT).setInitialWork(initialWork).build();
         NodeIdMessage joinRes = rpc.JOIN(joinReq);
         ByteString bootstrapNodeKey = joinRes.getBootstrapnodeidBytes();
-        System.out.println("bytestring. - " + bootstrapNodeKey);
         ByteString regularNodeKey = joinRes.getNodeidBytes();
-        KademliaKey x = new KademliaKey(bootstrapNodeKey);
-        System.out.println("My Key - 0x" + x.toHexaString());
+        System.out.println("[My Key] 0x" + new KademliaKey(regularNodeKey).toHexaString());
 
         // Checks if the initial work is valid.
         if (bootstrapNodeKey.equals("")) {
@@ -130,19 +129,27 @@ public class Core {
 
         // Lets add the closest nodes to my routing table
         // and send FIND_NODE's to them to populate my table and theirs.
-        Set<Contact> totalNearNodes = new HashSet<>();
+        Set<Contact> totalNearNodes = new HashSet<Contact>();
         Set<Contact> contactedNodes = new HashSet<Contact>();
         for (NodeDetailsMessage auxMsg : findNodeRes.getNodesList()) {
             totalNearNodes.add(Contact.fromNodeDetailsMessage(auxMsg));
         }
 
-        for (Contact nearNode : totalNearNodes) {
+        while (totalNearNodes.size() != 0) {
+            // hacky stuff
+            Contact nearNode = (Contact) totalNearNodes.toArray()[0];
+
             System.out.println("[FIND_NODE result (from bootstrap)] 0x" + nearNode.nodeID.toHexaString());
             // add this Node to my routing table.
             routingTable.addNode(Node.fromContact(nearNode));
 
             // lets add the node to the contacted ones.
             contactedNodes.add(nearNode);
+            System.out.println("contacted size: " + contactedNodes.size());
+            for (Contact aux : contactedNodes) {
+
+                System.out.println("contacted nodes : " + aux);
+            }
 
             // lets send a find node to the closest node, so the address and port are extracted from the contact. :)
             System.out.println("[Regular Node] - Sending Find Node Request to 0x" + nearNode.nodeID.toHexaString());
@@ -157,15 +164,13 @@ public class Core {
                 // if this node is new aka hasnt been contacted, add it to the set.
                 // if the node hasnt been contacted but its a repeat, it wont be added because its a set.
                 if (!contactedNodes.contains(cAux)) {
+
                     totalNearNodes.add(cAux);
                 }
             }
             // lets remove the current node from the list.
             totalNearNodes.remove(nearNode);
 
-            // if the size is 0, theres nothing to do : break
-            if (totalNearNodes.size() == 0)
-                break;
         }
 
     }
@@ -176,9 +181,8 @@ public class Core {
     public static void setupNodeAsBootstrap() {
         generateBootstrapNode(SERVER_ADDRESS, SERVER_PORT);
         routingTable = new RoutingTable(selfNode);
-        serverRPC = new KademliaBootstrapRPC(SERVER_ADDRESS, SERVER_PORT, routingTable, selfNode);
-        serverRPC.initializeConnection();
-        serverRPC.openConnectionChannel();
+        serverRPC = new KademliaBootstrapChannelRPC(SERVER_ADDRESS, SERVER_PORT, routingTable, selfNode);
+        serverRPC.start();
     }
 
     /**

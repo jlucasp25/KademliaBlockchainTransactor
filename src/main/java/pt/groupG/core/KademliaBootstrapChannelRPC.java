@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Works as the response handler for all the Bootstrap RPC channels.
  */
-public class KademliaBootstrapRPC {
+public class KademliaBootstrapChannelRPC extends Thread {
     private Server server;
     private int serverPort = 0;
     private String serverHost = "";
@@ -24,11 +24,16 @@ public class KademliaBootstrapRPC {
     RoutingTable selfTable = null;
     Node selfNode = null;
 
-    public KademliaBootstrapRPC(String host, int port, RoutingTable table, Node nd) {
+    public KademliaBootstrapChannelRPC(String host, int port, RoutingTable table, Node nd) {
         this.serverHost = host;
         this.serverPort = port;
         this.selfTable = table;
         this.selfNode = nd;
+    }
+
+    public void run() {
+        this.initializeConnection();
+        this.openConnectionChannel();
     }
 
     /**
@@ -70,7 +75,7 @@ public class KademliaBootstrapRPC {
          * PING RPC Response Handler
          */
         public void ping(EmptyMessage req, StreamObserver<BooleanMessage> res) {
-            System.out.println("[ServerService] Received PING");
+            System.out.println("[BootstrapService] Received PING");
             res.onNext(BooleanMessage.newBuilder().setValue(true).build());
             res.onCompleted();
         }
@@ -79,7 +84,7 @@ public class KademliaBootstrapRPC {
          * JOIN RPC Response Handler
          */
         public void join(JoinMessage req, StreamObserver<NodeIdMessage> res) {
-            System.out.println("[ServerService] Received JOIN");
+            System.out.println("[BootstrapService] Received JOIN");
             HashCash initialWorkHC = null;
 
             // validate initial work.
@@ -87,13 +92,13 @@ public class KademliaBootstrapRPC {
                 String initialWork = req.getInitialWork();
                 initialWorkHC = new HashCash(initialWork);
             } catch (Exception e) {
-                System.out.println("[ServerService] Generated Invalid Initial Work! (Sending empty message)");
+                System.out.println("[BootstrapService] Generated Invalid Initial Work! (Sending empty message)");
                 res.onNext(NodeIdMessage.newBuilder().build());
                 res.onCompleted();
                 return;
             }
 
-            System.out.println("[ServerService] Generating key for joined node.");
+            System.out.println("[BootstrapService] Generating key for joined node.");
             KademliaKey key = new KademliaKey();
             NodeIdMessage msg = NodeIdMessage.newBuilder().setNodeidBytes(ByteString.copyFrom(key.byteKey)).setBootstrapnodeidBytes(ByteString.copyFrom(selfNode.nodeID.byteKey)).build();
 
@@ -107,16 +112,18 @@ public class KademliaBootstrapRPC {
          * FIND-NODE RPC Response Handler
          */
         public void findNode(NodeDetailsMessage req, StreamObserver<NodeDetailsListMessage> res) {
-            System.out.println("[ServerService] Received FIND_NODE");
+            System.out.println("[BootstrapService] Received FIND_NODE");
 
-            System.out.println("[ServerService] Added request origin node to routing table!");
+            System.out.println("[BootstrapService] Added request origin node to routing table!");
             selfTable.addNode(new Node(new KademliaKey(req.getNodeidBytes()),req.getAddress(), req.getPort()));
 
-            System.out.println("[ServerService] Searching for closest nodes to " + new KademliaKey(req.getNodeidBytes()).toHexaString());
+            System.out.println("[BootstrapService] Searching for closest nodes to " + new KademliaKey(req.getNodeidBytes()).toHexaString());
 
             List<NodeDetailsMessage> nodes = new LinkedList<>();
 
             List<Contact> closestNodes = selfTable.getClosestNodes(req.getNodeidBytes(), req.getBootstrapnodeidBytes());
+
+            System.out.println(closestNodes.size());
 
             for (Contact aux : closestNodes) {
                 nodes.add(NodeDetailsMessage.newBuilder().setNodeidBytes(ByteString.copyFrom(aux.nodeID.byteKey)).setAddress(aux.getAddress()).setPort(aux.getPort()).build());

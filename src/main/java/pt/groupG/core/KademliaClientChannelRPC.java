@@ -39,7 +39,7 @@ public class KademliaClientChannelRPC extends Thread {
         try {
             this.server = ServerBuilder
                     .forPort(this.serverPort)
-                    .addService(new KademliaClientChannelRPC.ServerServiceImpl())
+                    .addService(new KademliaClientChannelRPC.ClientServiceImpl())
                     .build()
                     .start();
         } catch (IOException e) {
@@ -64,13 +64,13 @@ public class KademliaClientChannelRPC extends Thread {
     /**
      * Inner class that includes Handlers for the Server communication Services.
      */
-    class ServerServiceImpl extends ServerServiceGrpc.ServerServiceImplBase {
+    class ClientServiceImpl extends ServerServiceGrpc.ServerServiceImplBase {
 
         /**
          * PING RPC Response Handler
          */
         public void ping(EmptyMessage req, StreamObserver<BooleanMessage> res) {
-            System.out.println("[ServerService] Received PING");
+            System.out.println("[ClientService] Received PING");
             res.onNext(BooleanMessage.newBuilder().setValue(true).build());
             res.onCompleted();
         }
@@ -84,7 +84,7 @@ public class KademliaClientChannelRPC extends Thread {
             System.out.println("[ClientService] Added request origin node to routing table!");
             selfTable.addNode(new Node(new KademliaKey(req.getNodeidBytes()),req.getAddress(), req.getPort()));
 
-            System.out.println("[ClientService] Searching for closest nodes to " + new KademliaKey(req.getNodeidBytes()).toHexaString());
+            System.out.println("[ClientService] Searching for closest nodes to 0x" + new KademliaKey(req.getNodeidBytes()).toHexaString());
 
             List<NodeDetailsMessage> nodes = new LinkedList<>();
 

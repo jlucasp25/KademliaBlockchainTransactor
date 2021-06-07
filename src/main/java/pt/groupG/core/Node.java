@@ -2,8 +2,6 @@ package pt.groupG.core;
 
 import pt.groupG.grpc.NodeDetailsMessage;
 
-import java.nio.charset.StandardCharsets;
-
 public class Node {
     /**
      * Node
@@ -44,65 +42,17 @@ public class Node {
     }
 
     public static Node fromContact(Contact aux) {
-        return new Node(aux.nodeID, null, 0);
+        return new Node(aux.nodeID, aux.getAddress(), aux.getPort());
     }
 
 
     /**
      * Factory Constructor for Node using a NodeDetailsmessage object.
-     * @param msg
      */
     public static Node fromNodeDetailsMessage(NodeDetailsMessage msg) {
-        /*CASTS STRING TO BYTES[]; Maybe protobuf needs to be changed to bytes.*/
-        KademliaKey kdk = new KademliaKey(msg.getNodeid().getBytes(StandardCharsets.UTF_8));
+        KademliaKey kdk = new KademliaKey(msg.getNodeidBytes());
         return new Node(kdk, msg.getAddress(), msg.getPort());
     }
-
-    /**
-     * Converts a Node into a Protobuf message.
-     */
-  /*  public static NodeDetailsMessage toMessageFormat(Node node) {
-        return NodeDetailsMessage
-                .newBuilder()
-                .setAddress(node.address)
-                .setPort(node.port)
-                .setNodeid(node.nodeID)
-                .build();
-    }
-*/
-    /**
-     * Converts a Node Details Protobuf message into a Node.
-     */
-/*
-    public static Node fromMessageFormat(NodeDetailsMessage msg) {
-        return new Node(msg.getNodeid(),msg.getAddress(),msg.getPort());
-    }
-*/
-
-    /**
-     * Converts a Node Details List Protobuf message into a List of Nodes.
-     */
-/*
-    public static LinkedList<Node> fromMessageListFormat(NodeDetailsListMessage msg) {
-        LinkedList<Node> l = new LinkedList<Node>();
-        for (NodeDetailsMessage ndMsg : msg.getNodesList()) {
-            l.add(Node.fromMessageFormat(ndMsg));
-        }
-        return l;
-    }
-*/
-
-    /**
-     * Converts a list of Nodes into a Node Details List Protobuf message.
-     */
-//    public static NodeDetailsListMessage toMessageListFormat(LinkedList<Node> nodes) {
-//        LinkedList<NodeDetailsMessage> l = new LinkedList<NodeDetailsMessage>();
-//        for (Node aux : nodes) {
-//            l.add(Node.toMessageFormat(aux));
-//        }
-//        return NodeDetailsListMessage.newBuilder().addAllNodes(l).build();
-//    }
-
 
     @Override
     public String toString() {
