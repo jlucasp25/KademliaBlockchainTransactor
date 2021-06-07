@@ -1,5 +1,6 @@
 package pt.groupG.core;
 
+import pt.groupG.grpc.BooleanMessage;
 import pt.groupG.grpc.EmptyMessage;
 
 import java.util.LinkedList;
@@ -32,6 +33,7 @@ public class KBucket {
 
     /**
      * Returns true if the k-bucket is empty.
+     *
      * @return
      */
     public boolean isEmpty() {
@@ -45,26 +47,24 @@ public class KBucket {
      */
     public void addNode(Node aux) {
         Contact c = Contact.fromNode(aux);
-        if ( (!this.contacts.contains(c)) && this.contacts.size() < MAX_CONTACTS ) {
+        if ((!this.contacts.contains(c)) && this.contacts.size() < MAX_CONTACTS) {
             this.contacts.add(c);
-        }
-        else if (this.contacts.size() >= MAX_CONTACTS) {
+        } else if (this.contacts.size() >= MAX_CONTACTS) {
             // recepient pings the least recently seen node in the k bucket aka
             // in the head of the list to decide what to do. "ping(contacts.first())"
             Contact leastRecentlySeen = this.contacts.get(0);
-            KademliaClient kc = new KademliaClient(leastRecentlySeen.getAddress(), leastRecentlySeen.getPort());
-            boolean response = kc.PING(EmptyMessage.newBuilder().build());
-            if (response) {
+            KademliaClientRPC rpc = new KademliaClientRPC(leastRecentlySeen.getAddress(), leastRecentlySeen.getPort());
+            BooleanMessage res = rpc.PING(EmptyMessage.newBuilder().build());
+            if (res.getValue()) {
                 // remove contacts.first() and add to end of list; new contact is discarded.
                 this.contacts.remove(leastRecentlySeen);
                 this.contacts.add(leastRecentlySeen);
-            }
-            else {
+            } else {
                 // if ping fails -> remove contacts.first(); add new to tail [ contacts.add(aux) ]
                 this.contacts.remove(leastRecentlySeen);
                 this.contacts.add(c);
             }
-         }
+        }
     }
 
     public String toString() {

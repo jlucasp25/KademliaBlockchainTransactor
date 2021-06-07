@@ -19,6 +19,13 @@ public class KademliaClientRPC {
         this.channel = channel;
         stub = ServerServiceGrpc.newBlockingStub(channel);
     }
+
+    KademliaClientRPC(String host, int port) {
+        this.host = host;
+        this.port = port;
+        this.initializeConnection();
+    }
+
     public void initializeConnection() {
         channel = ManagedChannelBuilder
                 .forAddress(host, port)
@@ -31,11 +38,11 @@ public class KademliaClientRPC {
         channel.shutdown().awaitTermination(2, TimeUnit.SECONDS);
     }
 
-    public boolean PING(EmptyMessage req) {
+    public BooleanMessage PING(EmptyMessage req) {
         System.out.println("[Client RPC]: Sent PING");
         BooleanMessage res = null;
         res = this.stub.ping(req);
-        return res.getValue();
+        return res;
     }
 
     public NodeIdMessage JOIN(JoinMessage req) {

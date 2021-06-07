@@ -11,44 +11,64 @@ import java.util.LinkedList;
 import java.util.List;
 
 /* BOOTSTRAP NODE -> RESPONSE HANDLERS */
+
+/**
+ * Works as the response handler for all the Bootstrap RPC channels.
+ */
 public class KademliaBootstrapRPC {
     private Server server;
-    private final int SERVER_PORT = 8000;
+    private int serverPort = 0;
+    private String serverHost = "";
 
-    public void initializeConnection() throws IOException {
-        this.server = ServerBuilder
-                .forPort(SERVER_PORT)
-                .addService(new ServerServiceImpl())
-                .build()
-                .start();
+    public KademliaBootstrapRPC(String host, int port) {
+        this.serverHost = host;
+        this.serverPort = port;
     }
 
+    /**
+     * Initializes the server connection.
+     */
+    public void initializeConnection() {
+        try {
+            this.server = ServerBuilder
+                    .forPort(this.serverPort)
+                    .addService(new ServerServiceImpl())
+                    .build()
+                    .start();
+        } catch (IOException e) {
+            System.out.println("[KademliaBootstrapRPC] IOException when initializing server!");
+        }
+    }
 
 
     /**
      * Mantains the initialized connection opened until server is null.
-     * @throws InterruptedException
      */
-    public void openConnectionChannel() throws InterruptedException {
-        if (this.server != null) {
-            System.out.println("Bootstrap Node - Open for connections!");
-            server.awaitTermination();
+    public void openConnectionChannel() {
+        try {
+            if (this.server != null) {
+                System.out.println("[KademliaBootstrapRPC] Open for connections!");
+                server.awaitTermination();
+            }
+        }
+        catch (InterruptedException e) {
+            System.out.println("[KademliaBootstrapRPC] Execution Interrupted!");
         }
     }
 
     /**
-     * Defines RPC methods that send responses.
+     * Inner class that includes Handlers for the Server communication Services.
      */
     class ServerServiceImpl extends ServerServiceGrpc.ServerServiceImplBase {
 
         public void ping(EmptyMessage req, StreamObserver<BooleanMessage> res) {
-            System.out.println("SERVER: Received PING");
+            System.out.println("[ServerService] Received PING");
             res.onNext(BooleanMessage.newBuilder().setValue(true).build());
             res.onCompleted();
         }
 
         public void join(JoinMessage req, StreamObserver<NodeIdMessage> res) {
-            System.out.println("SERVER: Received JOIN");
+            System.out.println("[ServerService] Received JOIN");
 
             /*
             validate received initial work
@@ -64,7 +84,7 @@ public class KademliaBootstrapRPC {
                 return;
             }
 
-            System.out.println("SERVER: Generating key for joined node.");
+            System.out.println("[ServerService] Generating key for joined node.");
             KademliaKey key = new KademliaKey();
             NodeIdMessage msg = msgBuilder.setNodeid(key.toString()).setBootstrapnodeid(self.nodeID.toString()).build();
             routingTable.addNode(new Node(key, req.getAddress(), req.getPort()));
@@ -74,8 +94,8 @@ public class KademliaBootstrapRPC {
         }
 
         public void findNode(NodeIdMessage req, StreamObserver<NodeDetailsListMessage> res) {
-            System.out.println("SERVER: Received FIND_NODE");
-            System.out.println("SERVER: Searching for closests nodes to " + req.getNodeid());
+            System.out.println("[ServerService] Received FIND_NODE");
+            System.out.println("[ServerService] Searching for closests nodes to " + req.getNodeid());
             List<NodeDetailsMessage> nodes = new LinkedList<>();
             List<Contact> closestNodes = routingTable.getClosestNodes(req.getNodeid(), req.getBootstrapnodeid());
             for (Contact aux : closestNodes) {
