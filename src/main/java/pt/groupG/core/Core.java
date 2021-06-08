@@ -71,8 +71,8 @@ public class Core {
      * To prevent Sybil Attack
      */
     public static String sybilAttackPrevention() throws NoSuchAlgorithmException {
-
-        return HashCash.mintCash(generateRandomString(), 10).toString();
+        String random = generateRandomString().replace(',','c');
+        return HashCash.mintCash(random, 10).toString();
     }
 
     /**
@@ -86,7 +86,6 @@ public class Core {
         String initialWork = null;
         try {
             initialWork = sybilAttackPrevention();
-            initialWork = initialWork.replace(',','c');
         } catch (NoSuchAlgorithmException e) {
             System.out.println("[Regular Node #NONE] Initial Work failed. Exiting!");
             return;
@@ -100,6 +99,13 @@ public class Core {
         NodeIdMessage joinRes = rpc.JOIN(joinReq);
         ByteString bootstrapNodeKey = joinRes.getBootstrapnodeidBytes();
         ByteString regularNodeKey = joinRes.getNodeidBytes();
+        pt.groupG.grpc.Blockchain bc = joinRes.getBlockchain();
+        setBlockchain(bc);
+        try {
+            rpc.terminateConnection();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         bootstrapId = bootstrapNodeKey;
         System.out.println("[My Key] 0x" + new KademliaKey(regularNodeKey).toHexaString());
 
@@ -131,11 +137,17 @@ public class Core {
         rpc = new KademliaClientRPC(SERVER_ADDRESS, SERVER_PORT);
         NodeDetailsMessage findNodeReq = NodeDetailsMessage.newBuilder().setNodeidBytes(regularNodeKey).setAddress(SERVER_ADDRESS).setPort(CLIENT_PORT).setBootstrapnodeidBytes(bootstrapNodeKey).build();
         NodeDetailsListMessage findNodeRes = rpc.FIND_NODE(findNodeReq);
+        try {
+            rpc.terminateConnection();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         // Lets add the closest nodes to my routing table
         // and send FIND_NODE's to them to populate my table and theirs.
         Set<Contact> totalNearNodes = new HashSet<Contact>();
         Set<Contact> contactedNodes = new HashSet<Contact>();
+        contactedNodes.add(new Contact(new KademliaKey(bootstrapId), SERVER_ADDRESS, SERVER_PORT));
         for (NodeDetailsMessage auxMsg : findNodeRes.getNodesList()) {
             totalNearNodes.add(Contact.fromNodeDetailsMessage(auxMsg));
         }
@@ -161,6 +173,11 @@ public class Core {
             rpc = new KademliaClientRPC(nearNode.getAddress(), nearNode.getPort());
             NodeDetailsMessage cReq = NodeDetailsMessage.newBuilder().setNodeidBytes(ByteString.copyFrom(selfNode.nodeID.byteKey)).setAddress(SERVER_ADDRESS).setPort(CLIENT_PORT).setBootstrapnodeidBytes(bootstrapNodeKey).build();
             NodeDetailsListMessage cRes = rpc.FIND_NODE(cReq);
+            try {
+                rpc.terminateConnection();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
             // lets check the new near nodes.
             for (NodeDetailsMessage aux : cRes.getNodesList()) {
@@ -176,10 +193,22 @@ public class Core {
             // lets remove the current node from the list.
             totalNearNodes.remove(nearNode);
         }
-        pow = new PowExecutable(trans, selfNode, bootstrapId, routingTable, blockchain);
+        pow = new PowExecutable(/*trans,*/ selfNode, bootstrapId/*, routingTable, blockchain*/);
         pow.start();
         Menu();
     }
+
+    /**
+     *
+     */
+    public static void setBlockchain(pt.groupG.grpc.Blockchain bc) {
+        for (BlockData aux : bc.getBlockList()) {
+            List<String> trans = aux.getTList();
+            Block block = new Block(trans);
+            blockchain.newBlock(block);
+        }
+    }
+
 
     /**
      * Setups the Node as a bootstrap/master Peer.
@@ -271,7 +300,6 @@ public class Core {
         else {
             System.out.println("Insert the destination of your transaction: ");
             String dest = stdin.next();
-            System.out.println(dest);
             for (Contact aux : allContacts) {
                 if (aux.nodeID.toHexaString().equals(dest)) {
                     trans.add("[New Transaction] " + amount + "$ sent to 0x" + dest);
@@ -280,6 +308,11 @@ public class Core {
                     KademliaClientRPC rpc = new KademliaClientRPC(aux.getAddress(), aux.getPort());
                     MoneyMessage req = MoneyMessage.newBuilder().setValue(amount).build();
                     EmptyMessage res = rpc.PAY(req);
+                    try {
+                        rpc.terminateConnection();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     //decrease sender's wallet
                     selfNode.setWallet(selfNode.getWallet()-amount);
                     flag = 0;
@@ -299,7 +332,7 @@ public class Core {
         else {
             System.out.println("List of your transactions: ");
             for (String aux : trans) {
-                System.out.println("[Transaction] " + aux);
+                System.out.println(aux);
             }
         }
         Menu();

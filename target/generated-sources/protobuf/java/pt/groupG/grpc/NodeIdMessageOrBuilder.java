@@ -34,4 +34,17 @@ public interface NodeIdMessageOrBuilder extends
    */
   com.google.protobuf.ByteString
       getBootstrapnodeidBytes();
+
+  /**
+   * <code>.pt.groupG.grpc.Blockchain blockchain = 3;</code>
+   */
+  boolean hasBlockchain();
+  /**
+   * <code>.pt.groupG.grpc.Blockchain blockchain = 3;</code>
+   */
+  pt.groupG.grpc.Blockchain getBlockchain();
+  /**
+   * <code>.pt.groupG.grpc.Blockchain blockchain = 3;</code>
+   */
+  pt.groupG.grpc.BlockchainOrBuilder getBlockchainOrBuilder();
 }

@@ -55,6 +55,16 @@ public final class ServerProtos {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_pt_groupG_grpc_NodeIdMessage_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_pt_groupG_grpc_Blockchain_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_pt_groupG_grpc_Blockchain_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_pt_groupG_grpc_BlockData_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_pt_groupG_grpc_BlockData_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_pt_groupG_grpc_NodeIdListMessage_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -78,22 +88,26 @@ public final class ServerProtos {
       " \001(\t\022\014\n\004port\030\002 \001(\005\022\016\n\006nodeid\030\003 \001(\t\022\027\n\017bo" +
       "otstrapnodeid\030\004 \001(\t\"K\n\026NodeDetailsListMe" +
       "ssage\0221\n\005nodes\030\001 \003(\0132\".pt.groupG.grpc.No" +
-      "deDetailsMessage\"8\n\rNodeIdMessage\022\016\n\006nod" +
-      "eid\030\001 \001(\t\022\027\n\017bootstrapnodeid\030\002 \001(\t\"A\n\021No" +
-      "deIdListMessage\022,\n\005nodes\030\001 \003(\0132\035.pt.grou" +
-      "pG.grpc.NodeIdMessage2\322\003\n\rServerService\022" +
-      "B\n\004join\022\033.pt.groupG.grpc.JoinMessage\032\035.p" +
-      "t.groupG.grpc.NodeIdMessage\022D\n\004ping\022\034.pt" +
-      ".groupG.grpc.EmptyMessage\032\036.pt.groupG.gr" +
-      "pc.BooleanMessage\022V\n\010findNode\022\".pt.group" +
-      "G.grpc.NodeDetailsMessage\032&.pt.groupG.gr" +
-      "pc.NodeDetailsListMessage\022C\n\005store\022\034.pt." +
-      "groupG.grpc.StoreMessage\032\034.pt.groupG.grp" +
-      "c.EmptyMessage\022W\n\tfindValue\022\".pt.groupG." +
-      "grpc.NodeDetailsMessage\032&.pt.groupG.grpc" +
-      ".NodeDetailsListMessage\022A\n\003pay\022\034.pt.grou" +
-      "pG.grpc.MoneyMessage\032\034.pt.groupG.grpc.Em" +
-      "ptyMessageB\020B\014ServerProtosP\001b\006proto3"
+      "deDetailsMessage\"h\n\rNodeIdMessage\022\016\n\006nod" +
+      "eid\030\001 \001(\t\022\027\n\017bootstrapnodeid\030\002 \001(\t\022.\n\nbl" +
+      "ockchain\030\003 \001(\0132\032.pt.groupG.grpc.Blockcha" +
+      "in\"6\n\nBlockchain\022(\n\005block\030\001 \003(\0132\031.pt.gro" +
+      "upG.grpc.BlockData\"\026\n\tBlockData\022\t\n\001t\030\001 \003" +
+      "(\t\"A\n\021NodeIdListMessage\022,\n\005nodes\030\001 \003(\0132\035" +
+      ".pt.groupG.grpc.NodeIdMessage2\322\003\n\rServer" +
+      "Service\022B\n\004join\022\033.pt.groupG.grpc.JoinMes" +
+      "sage\032\035.pt.groupG.grpc.NodeIdMessage\022D\n\004p" +
+      "ing\022\034.pt.groupG.grpc.EmptyMessage\032\036.pt.g" +
+      "roupG.grpc.BooleanMessage\022V\n\010findNode\022\"." +
+      "pt.groupG.grpc.NodeDetailsMessage\032&.pt.g" +
+      "roupG.grpc.NodeDetailsListMessage\022C\n\005sto" +
+      "re\022\034.pt.groupG.grpc.StoreMessage\032\034.pt.gr" +
+      "oupG.grpc.EmptyMessage\022W\n\tfindValue\022\".pt" +
+      ".groupG.grpc.NodeDetailsMessage\032&.pt.gro" +
+      "upG.grpc.NodeDetailsListMessage\022A\n\003pay\022\034" +
+      ".pt.groupG.grpc.MoneyMessage\032\034.pt.groupG" +
+      ".grpc.EmptyMessageB\020B\014ServerProtosP\001b\006pr" +
+      "oto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -146,9 +160,21 @@ public final class ServerProtos {
     internal_static_pt_groupG_grpc_NodeIdMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_pt_groupG_grpc_NodeIdMessage_descriptor,
-        new java.lang.String[] { "Nodeid", "Bootstrapnodeid", });
-    internal_static_pt_groupG_grpc_NodeIdListMessage_descriptor =
+        new java.lang.String[] { "Nodeid", "Bootstrapnodeid", "Blockchain", });
+    internal_static_pt_groupG_grpc_Blockchain_descriptor =
       getDescriptor().getMessageTypes().get(8);
+    internal_static_pt_groupG_grpc_Blockchain_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_pt_groupG_grpc_Blockchain_descriptor,
+        new java.lang.String[] { "Block", });
+    internal_static_pt_groupG_grpc_BlockData_descriptor =
+      getDescriptor().getMessageTypes().get(9);
+    internal_static_pt_groupG_grpc_BlockData_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_pt_groupG_grpc_BlockData_descriptor,
+        new java.lang.String[] { "T", });
+    internal_static_pt_groupG_grpc_NodeIdListMessage_descriptor =
+      getDescriptor().getMessageTypes().get(10);
     internal_static_pt_groupG_grpc_NodeIdListMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_pt_groupG_grpc_NodeIdListMessage_descriptor,

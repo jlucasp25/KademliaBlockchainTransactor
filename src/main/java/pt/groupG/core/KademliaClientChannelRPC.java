@@ -5,6 +5,7 @@ import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
 import org.bouncycastle.util.Store;
+import pt.groupG.core.blockchain.Block;
 import pt.groupG.core.blockchain.Blockchain;
 import pt.groupG.grpc.*;
 
@@ -113,6 +114,9 @@ public class KademliaClientChannelRPC extends Thread {
 
         public void store(StoreMessage req, StreamObserver<EmptyMessage> res) {
             System.out.println("[ClientService] Received STORE");
+            Block block = new Block(req.getTransactionList());
+            Core.blockchain.newBlock(block);
+            System.out.println("[ClientService] Blockchain is now with " + Blockchain.blocks.size() + " blocks.");
             res.onNext(EmptyMessage.newBuilder().build());
             res.onCompleted();
         }

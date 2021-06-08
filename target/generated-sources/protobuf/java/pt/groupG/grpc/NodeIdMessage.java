@@ -62,6 +62,19 @@ private static final long serialVersionUID = 0L;
             bootstrapnodeid_ = s;
             break;
           }
+          case 26: {
+            pt.groupG.grpc.Blockchain.Builder subBuilder = null;
+            if (blockchain_ != null) {
+              subBuilder = blockchain_.toBuilder();
+            }
+            blockchain_ = input.readMessage(pt.groupG.grpc.Blockchain.parser(), extensionRegistry);
+            if (subBuilder != null) {
+              subBuilder.mergeFrom(blockchain_);
+              blockchain_ = subBuilder.buildPartial();
+            }
+
+            break;
+          }
           default: {
             if (!parseUnknownField(
                 input, unknownFields, extensionRegistry, tag)) {
@@ -170,6 +183,27 @@ private static final long serialVersionUID = 0L;
     }
   }
 
+  public static final int BLOCKCHAIN_FIELD_NUMBER = 3;
+  private pt.groupG.grpc.Blockchain blockchain_;
+  /**
+   * <code>.pt.groupG.grpc.Blockchain blockchain = 3;</code>
+   */
+  public boolean hasBlockchain() {
+    return blockchain_ != null;
+  }
+  /**
+   * <code>.pt.groupG.grpc.Blockchain blockchain = 3;</code>
+   */
+  public pt.groupG.grpc.Blockchain getBlockchain() {
+    return blockchain_ == null ? pt.groupG.grpc.Blockchain.getDefaultInstance() : blockchain_;
+  }
+  /**
+   * <code>.pt.groupG.grpc.Blockchain blockchain = 3;</code>
+   */
+  public pt.groupG.grpc.BlockchainOrBuilder getBlockchainOrBuilder() {
+    return getBlockchain();
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -190,6 +224,9 @@ private static final long serialVersionUID = 0L;
     if (!getBootstrapnodeidBytes().isEmpty()) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 2, bootstrapnodeid_);
     }
+    if (blockchain_ != null) {
+      output.writeMessage(3, getBlockchain());
+    }
     unknownFields.writeTo(output);
   }
 
@@ -204,6 +241,10 @@ private static final long serialVersionUID = 0L;
     }
     if (!getBootstrapnodeidBytes().isEmpty()) {
       size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, bootstrapnodeid_);
+    }
+    if (blockchain_ != null) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(3, getBlockchain());
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
@@ -224,6 +265,11 @@ private static final long serialVersionUID = 0L;
         .equals(other.getNodeid())) return false;
     if (!getBootstrapnodeid()
         .equals(other.getBootstrapnodeid())) return false;
+    if (hasBlockchain() != other.hasBlockchain()) return false;
+    if (hasBlockchain()) {
+      if (!getBlockchain()
+          .equals(other.getBlockchain())) return false;
+    }
     if (!unknownFields.equals(other.unknownFields)) return false;
     return true;
   }
@@ -239,6 +285,10 @@ private static final long serialVersionUID = 0L;
     hash = (53 * hash) + getNodeid().hashCode();
     hash = (37 * hash) + BOOTSTRAPNODEID_FIELD_NUMBER;
     hash = (53 * hash) + getBootstrapnodeid().hashCode();
+    if (hasBlockchain()) {
+      hash = (37 * hash) + BLOCKCHAIN_FIELD_NUMBER;
+      hash = (53 * hash) + getBlockchain().hashCode();
+    }
     hash = (29 * hash) + unknownFields.hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -376,6 +426,12 @@ private static final long serialVersionUID = 0L;
 
       bootstrapnodeid_ = "";
 
+      if (blockchainBuilder_ == null) {
+        blockchain_ = null;
+      } else {
+        blockchain_ = null;
+        blockchainBuilder_ = null;
+      }
       return this;
     }
 
@@ -404,6 +460,11 @@ private static final long serialVersionUID = 0L;
       pt.groupG.grpc.NodeIdMessage result = new pt.groupG.grpc.NodeIdMessage(this);
       result.nodeid_ = nodeid_;
       result.bootstrapnodeid_ = bootstrapnodeid_;
+      if (blockchainBuilder_ == null) {
+        result.blockchain_ = blockchain_;
+      } else {
+        result.blockchain_ = blockchainBuilder_.build();
+      }
       onBuilt();
       return result;
     }
@@ -459,6 +520,9 @@ private static final long serialVersionUID = 0L;
       if (!other.getBootstrapnodeid().isEmpty()) {
         bootstrapnodeid_ = other.bootstrapnodeid_;
         onChanged();
+      }
+      if (other.hasBlockchain()) {
+        mergeBlockchain(other.getBlockchain());
       }
       this.mergeUnknownFields(other.unknownFields);
       onChanged();
@@ -645,6 +709,123 @@ private static final long serialVersionUID = 0L;
       bootstrapnodeid_ = value;
       onChanged();
       return this;
+    }
+
+    private pt.groupG.grpc.Blockchain blockchain_;
+    private com.google.protobuf.SingleFieldBuilderV3<
+        pt.groupG.grpc.Blockchain, pt.groupG.grpc.Blockchain.Builder, pt.groupG.grpc.BlockchainOrBuilder> blockchainBuilder_;
+    /**
+     * <code>.pt.groupG.grpc.Blockchain blockchain = 3;</code>
+     */
+    public boolean hasBlockchain() {
+      return blockchainBuilder_ != null || blockchain_ != null;
+    }
+    /**
+     * <code>.pt.groupG.grpc.Blockchain blockchain = 3;</code>
+     */
+    public pt.groupG.grpc.Blockchain getBlockchain() {
+      if (blockchainBuilder_ == null) {
+        return blockchain_ == null ? pt.groupG.grpc.Blockchain.getDefaultInstance() : blockchain_;
+      } else {
+        return blockchainBuilder_.getMessage();
+      }
+    }
+    /**
+     * <code>.pt.groupG.grpc.Blockchain blockchain = 3;</code>
+     */
+    public Builder setBlockchain(pt.groupG.grpc.Blockchain value) {
+      if (blockchainBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        blockchain_ = value;
+        onChanged();
+      } else {
+        blockchainBuilder_.setMessage(value);
+      }
+
+      return this;
+    }
+    /**
+     * <code>.pt.groupG.grpc.Blockchain blockchain = 3;</code>
+     */
+    public Builder setBlockchain(
+        pt.groupG.grpc.Blockchain.Builder builderForValue) {
+      if (blockchainBuilder_ == null) {
+        blockchain_ = builderForValue.build();
+        onChanged();
+      } else {
+        blockchainBuilder_.setMessage(builderForValue.build());
+      }
+
+      return this;
+    }
+    /**
+     * <code>.pt.groupG.grpc.Blockchain blockchain = 3;</code>
+     */
+    public Builder mergeBlockchain(pt.groupG.grpc.Blockchain value) {
+      if (blockchainBuilder_ == null) {
+        if (blockchain_ != null) {
+          blockchain_ =
+            pt.groupG.grpc.Blockchain.newBuilder(blockchain_).mergeFrom(value).buildPartial();
+        } else {
+          blockchain_ = value;
+        }
+        onChanged();
+      } else {
+        blockchainBuilder_.mergeFrom(value);
+      }
+
+      return this;
+    }
+    /**
+     * <code>.pt.groupG.grpc.Blockchain blockchain = 3;</code>
+     */
+    public Builder clearBlockchain() {
+      if (blockchainBuilder_ == null) {
+        blockchain_ = null;
+        onChanged();
+      } else {
+        blockchain_ = null;
+        blockchainBuilder_ = null;
+      }
+
+      return this;
+    }
+    /**
+     * <code>.pt.groupG.grpc.Blockchain blockchain = 3;</code>
+     */
+    public pt.groupG.grpc.Blockchain.Builder getBlockchainBuilder() {
+      
+      onChanged();
+      return getBlockchainFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>.pt.groupG.grpc.Blockchain blockchain = 3;</code>
+     */
+    public pt.groupG.grpc.BlockchainOrBuilder getBlockchainOrBuilder() {
+      if (blockchainBuilder_ != null) {
+        return blockchainBuilder_.getMessageOrBuilder();
+      } else {
+        return blockchain_ == null ?
+            pt.groupG.grpc.Blockchain.getDefaultInstance() : blockchain_;
+      }
+    }
+    /**
+     * <code>.pt.groupG.grpc.Blockchain blockchain = 3;</code>
+     */
+    private com.google.protobuf.SingleFieldBuilderV3<
+        pt.groupG.grpc.Blockchain, pt.groupG.grpc.Blockchain.Builder, pt.groupG.grpc.BlockchainOrBuilder> 
+        getBlockchainFieldBuilder() {
+      if (blockchainBuilder_ == null) {
+        blockchainBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            pt.groupG.grpc.Blockchain, pt.groupG.grpc.Blockchain.Builder, pt.groupG.grpc.BlockchainOrBuilder>(
+                getBlockchain(),
+                getParentForChildren(),
+                isClean());
+        blockchain_ = null;
+      }
+      return blockchainBuilder_;
     }
     @java.lang.Override
     public final Builder setUnknownFields(

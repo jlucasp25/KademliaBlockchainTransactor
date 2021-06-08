@@ -27,13 +27,11 @@ public class Blockchain {
     }
 
     public void newBlock(Block newblock) {
-        if(HashValidator()) {
-            newblock.mineBlock(dif);
-            blocks.add(newblock);
-            System.out.println("New Block added.");
-        }
-        else
-            System.out.println("Can't add this block. Hashes does not match.");
+        //if(HashValidator()) {
+        newblock.mineBlock(dif);
+        blocks.add(newblock);
+        System.out.println("New Block added.");
+        //}
     }
 
 }

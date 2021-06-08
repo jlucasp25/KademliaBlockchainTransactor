@@ -5,6 +5,8 @@ import com.google.protobuf.ByteString;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
+import pt.groupG.core.blockchain.Block;
+import pt.groupG.core.blockchain.Blockchain;
 import pt.groupG.grpc.*;
 
 import java.io.IOException;
@@ -100,7 +102,21 @@ public class KademliaBootstrapChannelRPC extends Thread {
 
             System.out.println("[BootstrapService] Generating key for joined node.");
             KademliaKey key = new KademliaKey();
-            NodeIdMessage msg = NodeIdMessage.newBuilder().setNodeidBytes(ByteString.copyFrom(key.byteKey)).setBootstrapnodeidBytes(ByteString.copyFrom(selfNode.nodeID.byteKey)).build();
+            NodeIdMessage.Builder builder = NodeIdMessage.newBuilder()
+                    .setNodeidBytes(ByteString.copyFrom(key.byteKey))
+                    .setBootstrapnodeidBytes(ByteString.copyFrom(selfNode.nodeID.byteKey));
+
+            List<BlockData> blocks = new LinkedList<>();
+            for(Block aux : Blockchain.blocks) {
+                BlockData block = BlockData.newBuilder().addAllT(aux.trans).build();
+                blocks.add(block);
+            }
+
+            pt.groupG.grpc.Blockchain bc = pt.groupG.grpc.Blockchain.newBuilder()
+                    .addAllBlock(blocks).build();
+
+            builder.setBlockchain(bc);
+            NodeIdMessage msg = builder.build();
 
             // add created node to routing table.
             selfTable.addNode(new Node(key, req.getAddress(), req.getPort()));
@@ -135,9 +151,18 @@ public class KademliaBootstrapChannelRPC extends Thread {
         }
 
         public void pay(MoneyMessage req, StreamObserver<EmptyMessage> res) {
-            System.out.println("[ClientService] Received PAY");
+            System.out.println("[BootstrapService] Received PAY");
             int amount = req.getValue();
             selfNode.setWallet(selfNode.getWallet()+amount);
+            res.onNext(EmptyMessage.newBuilder().build());
+            res.onCompleted();
+        }
+
+        public void store(StoreMessage req, StreamObserver<EmptyMessage> res) {
+            System.out.println("[BootstrapService] Received STORE");
+            Block block = new Block(req.getTransactionList());
+            Core.blockchain.newBlock(block);
+            System.out.println("[BootstrapService] Blockchain is now with " + Blockchain.blocks.size() + " blocks.");
             res.onNext(EmptyMessage.newBuilder().build());
             res.onCompleted();
         }

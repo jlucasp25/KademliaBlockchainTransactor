@@ -50,6 +50,15 @@ message NodeDetailsListMessage {
 message NodeIdMessage {
   string nodeid = 1;
   string bootstrapnodeid = 2; // Id of the host that gave the id.
+  Blockchain blockchain = 3;
+}
+
+message Blockchain {
+  repeated BlockData block = 1;
+}
+
+message BlockData {
+  repeated string t = 1;
 }
 
 message NodeIdListMessage {
