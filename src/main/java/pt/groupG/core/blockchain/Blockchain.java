@@ -26,7 +26,7 @@ public class Blockchain {
         return true;
     }
 
-    public void NewBlock(Block newblock) {
+    public void newBlock(Block newblock) {
         if(HashValidator()) {
             newblock.mineBlock(dif);
             blocks.add(newblock);

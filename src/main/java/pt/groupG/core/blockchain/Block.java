@@ -22,13 +22,11 @@ public class Block {
             this.hash = calculateBlockHash();
         }
 
-        public Block (String hash, String previousHash, String merkelTree, List<String> trans, long timeStamp, int nonce) {
+        public Block (String hash, String previousHash, List<String> trans, long timeStamp) {
             this.hash = hash;
             this.previousHash = previousHash;
-            this.merkleTree = merkelTree;
             this.trans = trans;
             this.timeStamp = timeStamp;
-            this.nonce = nonce;
         }
 
         public Block (List<String> trans) {
@@ -36,7 +34,6 @@ public class Block {
         }
 
         public void mineBlock(int dif) {
-            // merkleTree = getMerleRoot(ver funçao)
             String prefixString = new String(new char[dif]).replace('\0', '0');
             while (!hash.substring(0, dif)
                     .equals(prefixString)) {

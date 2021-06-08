@@ -120,6 +120,37 @@ public final class ServerServiceGrpc {
     return getFindNodeMethod;
   }
 
+  private static volatile io.grpc.MethodDescriptor<pt.groupG.grpc.StoreMessage,
+      pt.groupG.grpc.EmptyMessage> getStoreMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "store",
+      requestType = pt.groupG.grpc.StoreMessage.class,
+      responseType = pt.groupG.grpc.EmptyMessage.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<pt.groupG.grpc.StoreMessage,
+      pt.groupG.grpc.EmptyMessage> getStoreMethod() {
+    io.grpc.MethodDescriptor<pt.groupG.grpc.StoreMessage, pt.groupG.grpc.EmptyMessage> getStoreMethod;
+    if ((getStoreMethod = ServerServiceGrpc.getStoreMethod) == null) {
+      synchronized (ServerServiceGrpc.class) {
+        if ((getStoreMethod = ServerServiceGrpc.getStoreMethod) == null) {
+          ServerServiceGrpc.getStoreMethod = getStoreMethod =
+              io.grpc.MethodDescriptor.<pt.groupG.grpc.StoreMessage, pt.groupG.grpc.EmptyMessage>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "store"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  pt.groupG.grpc.StoreMessage.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  pt.groupG.grpc.EmptyMessage.getDefaultInstance()))
+              .setSchemaDescriptor(new ServerServiceMethodDescriptorSupplier("store"))
+              .build();
+        }
+      }
+    }
+    return getStoreMethod;
+  }
+
   private static volatile io.grpc.MethodDescriptor<pt.groupG.grpc.NodeDetailsMessage,
       pt.groupG.grpc.NodeDetailsListMessage> getFindValueMethod;
 
@@ -149,6 +180,37 @@ public final class ServerServiceGrpc {
       }
     }
     return getFindValueMethod;
+  }
+
+  private static volatile io.grpc.MethodDescriptor<pt.groupG.grpc.MoneyMessage,
+      pt.groupG.grpc.EmptyMessage> getPayMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "pay",
+      requestType = pt.groupG.grpc.MoneyMessage.class,
+      responseType = pt.groupG.grpc.EmptyMessage.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<pt.groupG.grpc.MoneyMessage,
+      pt.groupG.grpc.EmptyMessage> getPayMethod() {
+    io.grpc.MethodDescriptor<pt.groupG.grpc.MoneyMessage, pt.groupG.grpc.EmptyMessage> getPayMethod;
+    if ((getPayMethod = ServerServiceGrpc.getPayMethod) == null) {
+      synchronized (ServerServiceGrpc.class) {
+        if ((getPayMethod = ServerServiceGrpc.getPayMethod) == null) {
+          ServerServiceGrpc.getPayMethod = getPayMethod =
+              io.grpc.MethodDescriptor.<pt.groupG.grpc.MoneyMessage, pt.groupG.grpc.EmptyMessage>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "pay"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  pt.groupG.grpc.MoneyMessage.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  pt.groupG.grpc.EmptyMessage.getDefaultInstance()))
+              .setSchemaDescriptor(new ServerServiceMethodDescriptorSupplier("pay"))
+              .build();
+        }
+      }
+    }
+    return getPayMethod;
   }
 
   /**
@@ -201,9 +263,23 @@ public final class ServerServiceGrpc {
 
     /**
      */
+    public void store(pt.groupG.grpc.StoreMessage request,
+        io.grpc.stub.StreamObserver<pt.groupG.grpc.EmptyMessage> responseObserver) {
+      asyncUnimplementedUnaryCall(getStoreMethod(), responseObserver);
+    }
+
+    /**
+     */
     public void findValue(pt.groupG.grpc.NodeDetailsMessage request,
         io.grpc.stub.StreamObserver<pt.groupG.grpc.NodeDetailsListMessage> responseObserver) {
       asyncUnimplementedUnaryCall(getFindValueMethod(), responseObserver);
+    }
+
+    /**
+     */
+    public void pay(pt.groupG.grpc.MoneyMessage request,
+        io.grpc.stub.StreamObserver<pt.groupG.grpc.EmptyMessage> responseObserver) {
+      asyncUnimplementedUnaryCall(getPayMethod(), responseObserver);
     }
 
     @java.lang.Override public final io.grpc.ServerServiceDefinition bindService() {
@@ -230,12 +306,26 @@ public final class ServerServiceGrpc {
                 pt.groupG.grpc.NodeDetailsListMessage>(
                   this, METHODID_FIND_NODE)))
           .addMethod(
+            getStoreMethod(),
+            asyncUnaryCall(
+              new MethodHandlers<
+                pt.groupG.grpc.StoreMessage,
+                pt.groupG.grpc.EmptyMessage>(
+                  this, METHODID_STORE)))
+          .addMethod(
             getFindValueMethod(),
             asyncUnaryCall(
               new MethodHandlers<
                 pt.groupG.grpc.NodeDetailsMessage,
                 pt.groupG.grpc.NodeDetailsListMessage>(
                   this, METHODID_FIND_VALUE)))
+          .addMethod(
+            getPayMethod(),
+            asyncUnaryCall(
+              new MethodHandlers<
+                pt.groupG.grpc.MoneyMessage,
+                pt.groupG.grpc.EmptyMessage>(
+                  this, METHODID_PAY)))
           .build();
     }
   }
@@ -284,10 +374,26 @@ public final class ServerServiceGrpc {
 
     /**
      */
+    public void store(pt.groupG.grpc.StoreMessage request,
+        io.grpc.stub.StreamObserver<pt.groupG.grpc.EmptyMessage> responseObserver) {
+      asyncUnaryCall(
+          getChannel().newCall(getStoreMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     */
     public void findValue(pt.groupG.grpc.NodeDetailsMessage request,
         io.grpc.stub.StreamObserver<pt.groupG.grpc.NodeDetailsListMessage> responseObserver) {
       asyncUnaryCall(
           getChannel().newCall(getFindValueMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     */
+    public void pay(pt.groupG.grpc.MoneyMessage request,
+        io.grpc.stub.StreamObserver<pt.groupG.grpc.EmptyMessage> responseObserver) {
+      asyncUnaryCall(
+          getChannel().newCall(getPayMethod(), getCallOptions()), request, responseObserver);
     }
   }
 
@@ -332,9 +438,23 @@ public final class ServerServiceGrpc {
 
     /**
      */
+    public pt.groupG.grpc.EmptyMessage store(pt.groupG.grpc.StoreMessage request) {
+      return blockingUnaryCall(
+          getChannel(), getStoreMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
     public pt.groupG.grpc.NodeDetailsListMessage findValue(pt.groupG.grpc.NodeDetailsMessage request) {
       return blockingUnaryCall(
           getChannel(), getFindValueMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public pt.groupG.grpc.EmptyMessage pay(pt.groupG.grpc.MoneyMessage request) {
+      return blockingUnaryCall(
+          getChannel(), getPayMethod(), getCallOptions(), request);
     }
   }
 
@@ -382,17 +502,35 @@ public final class ServerServiceGrpc {
 
     /**
      */
+    public com.google.common.util.concurrent.ListenableFuture<pt.groupG.grpc.EmptyMessage> store(
+        pt.groupG.grpc.StoreMessage request) {
+      return futureUnaryCall(
+          getChannel().newCall(getStoreMethod(), getCallOptions()), request);
+    }
+
+    /**
+     */
     public com.google.common.util.concurrent.ListenableFuture<pt.groupG.grpc.NodeDetailsListMessage> findValue(
         pt.groupG.grpc.NodeDetailsMessage request) {
       return futureUnaryCall(
           getChannel().newCall(getFindValueMethod(), getCallOptions()), request);
+    }
+
+    /**
+     */
+    public com.google.common.util.concurrent.ListenableFuture<pt.groupG.grpc.EmptyMessage> pay(
+        pt.groupG.grpc.MoneyMessage request) {
+      return futureUnaryCall(
+          getChannel().newCall(getPayMethod(), getCallOptions()), request);
     }
   }
 
   private static final int METHODID_JOIN = 0;
   private static final int METHODID_PING = 1;
   private static final int METHODID_FIND_NODE = 2;
-  private static final int METHODID_FIND_VALUE = 3;
+  private static final int METHODID_STORE = 3;
+  private static final int METHODID_FIND_VALUE = 4;
+  private static final int METHODID_PAY = 5;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -423,9 +561,17 @@ public final class ServerServiceGrpc {
           serviceImpl.findNode((pt.groupG.grpc.NodeDetailsMessage) request,
               (io.grpc.stub.StreamObserver<pt.groupG.grpc.NodeDetailsListMessage>) responseObserver);
           break;
+        case METHODID_STORE:
+          serviceImpl.store((pt.groupG.grpc.StoreMessage) request,
+              (io.grpc.stub.StreamObserver<pt.groupG.grpc.EmptyMessage>) responseObserver);
+          break;
         case METHODID_FIND_VALUE:
           serviceImpl.findValue((pt.groupG.grpc.NodeDetailsMessage) request,
               (io.grpc.stub.StreamObserver<pt.groupG.grpc.NodeDetailsListMessage>) responseObserver);
+          break;
+        case METHODID_PAY:
+          serviceImpl.pay((pt.groupG.grpc.MoneyMessage) request,
+              (io.grpc.stub.StreamObserver<pt.groupG.grpc.EmptyMessage>) responseObserver);
           break;
         default:
           throw new AssertionError();
@@ -491,7 +637,9 @@ public final class ServerServiceGrpc {
               .addMethod(getJoinMethod())
               .addMethod(getPingMethod())
               .addMethod(getFindNodeMethod())
+              .addMethod(getStoreMethod())
               .addMethod(getFindValueMethod())
+              .addMethod(getPayMethod())
               .build();
         }
       }

@@ -15,6 +15,16 @@ public final class ServerProtos {
         (com.google.protobuf.ExtensionRegistryLite) registry);
   }
   static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_pt_groupG_grpc_StoreMessage_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_pt_groupG_grpc_StoreMessage_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_pt_groupG_grpc_MoneyMessage_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_pt_groupG_grpc_MoneyMessage_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_pt_groupG_grpc_JoinMessage_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -58,70 +68,87 @@ public final class ServerProtos {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\021ServerProto.proto\022\016pt.groupG.grpc\"A\n\013J" +
-      "oinMessage\022\017\n\007address\030\001 \001(\t\022\014\n\004port\030\002 \001(" +
-      "\005\022\023\n\013initialWork\030\003 \001(\t\"\037\n\016BooleanMessage" +
-      "\022\r\n\005value\030\001 \001(\010\"\016\n\014EmptyMessage\"\\\n\022NodeD" +
-      "etailsMessage\022\017\n\007address\030\001 \001(\t\022\014\n\004port\030\002" +
-      " \001(\005\022\016\n\006nodeid\030\003 \001(\t\022\027\n\017bootstrapnodeid\030" +
-      "\004 \001(\t\"K\n\026NodeDetailsListMessage\0221\n\005nodes" +
-      "\030\001 \003(\0132\".pt.groupG.grpc.NodeDetailsMessa" +
-      "ge\"8\n\rNodeIdMessage\022\016\n\006nodeid\030\001 \001(\t\022\027\n\017b" +
-      "ootstrapnodeid\030\002 \001(\t\"A\n\021NodeIdListMessag" +
-      "e\022,\n\005nodes\030\001 \003(\0132\035.pt.groupG.grpc.NodeId" +
-      "Message2\312\002\n\rServerService\022B\n\004join\022\033.pt.g" +
-      "roupG.grpc.JoinMessage\032\035.pt.groupG.grpc." +
-      "NodeIdMessage\022D\n\004ping\022\034.pt.groupG.grpc.E" +
-      "mptyMessage\032\036.pt.groupG.grpc.BooleanMess" +
-      "age\022V\n\010findNode\022\".pt.groupG.grpc.NodeDet" +
-      "ailsMessage\032&.pt.groupG.grpc.NodeDetails" +
-      "ListMessage\022W\n\tfindValue\022\".pt.groupG.grp" +
-      "c.NodeDetailsMessage\032&.pt.groupG.grpc.No" +
-      "deDetailsListMessageB\020B\014ServerProtosP\001b\006" +
-      "proto3"
+      "\n\021ServerProto.proto\022\016pt.groupG.grpc\"=\n\014S" +
+      "toreMessage\022\n\n\002id\030\001 \001(\t\022\023\n\013transaction\030\002" +
+      " \003(\t\022\014\n\004cash\030\003 \001(\t\"\035\n\014MoneyMessage\022\r\n\005va" +
+      "lue\030\001 \001(\005\"A\n\013JoinMessage\022\017\n\007address\030\001 \001(" +
+      "\t\022\014\n\004port\030\002 \001(\005\022\023\n\013initialWork\030\003 \001(\t\"\037\n\016" +
+      "BooleanMessage\022\r\n\005value\030\001 \001(\010\"\016\n\014EmptyMe" +
+      "ssage\"\\\n\022NodeDetailsMessage\022\017\n\007address\030\001" +
+      " \001(\t\022\014\n\004port\030\002 \001(\005\022\016\n\006nodeid\030\003 \001(\t\022\027\n\017bo" +
+      "otstrapnodeid\030\004 \001(\t\"K\n\026NodeDetailsListMe" +
+      "ssage\0221\n\005nodes\030\001 \003(\0132\".pt.groupG.grpc.No" +
+      "deDetailsMessage\"8\n\rNodeIdMessage\022\016\n\006nod" +
+      "eid\030\001 \001(\t\022\027\n\017bootstrapnodeid\030\002 \001(\t\"A\n\021No" +
+      "deIdListMessage\022,\n\005nodes\030\001 \003(\0132\035.pt.grou" +
+      "pG.grpc.NodeIdMessage2\322\003\n\rServerService\022" +
+      "B\n\004join\022\033.pt.groupG.grpc.JoinMessage\032\035.p" +
+      "t.groupG.grpc.NodeIdMessage\022D\n\004ping\022\034.pt" +
+      ".groupG.grpc.EmptyMessage\032\036.pt.groupG.gr" +
+      "pc.BooleanMessage\022V\n\010findNode\022\".pt.group" +
+      "G.grpc.NodeDetailsMessage\032&.pt.groupG.gr" +
+      "pc.NodeDetailsListMessage\022C\n\005store\022\034.pt." +
+      "groupG.grpc.StoreMessage\032\034.pt.groupG.grp" +
+      "c.EmptyMessage\022W\n\tfindValue\022\".pt.groupG." +
+      "grpc.NodeDetailsMessage\032&.pt.groupG.grpc" +
+      ".NodeDetailsListMessage\022A\n\003pay\022\034.pt.grou" +
+      "pG.grpc.MoneyMessage\032\034.pt.groupG.grpc.Em" +
+      "ptyMessageB\020B\014ServerProtosP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         });
-    internal_static_pt_groupG_grpc_JoinMessage_descriptor =
+    internal_static_pt_groupG_grpc_StoreMessage_descriptor =
       getDescriptor().getMessageTypes().get(0);
+    internal_static_pt_groupG_grpc_StoreMessage_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_pt_groupG_grpc_StoreMessage_descriptor,
+        new java.lang.String[] { "Id", "Transaction", "Cash", });
+    internal_static_pt_groupG_grpc_MoneyMessage_descriptor =
+      getDescriptor().getMessageTypes().get(1);
+    internal_static_pt_groupG_grpc_MoneyMessage_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_pt_groupG_grpc_MoneyMessage_descriptor,
+        new java.lang.String[] { "Value", });
+    internal_static_pt_groupG_grpc_JoinMessage_descriptor =
+      getDescriptor().getMessageTypes().get(2);
     internal_static_pt_groupG_grpc_JoinMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_pt_groupG_grpc_JoinMessage_descriptor,
         new java.lang.String[] { "Address", "Port", "InitialWork", });
     internal_static_pt_groupG_grpc_BooleanMessage_descriptor =
-      getDescriptor().getMessageTypes().get(1);
+      getDescriptor().getMessageTypes().get(3);
     internal_static_pt_groupG_grpc_BooleanMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_pt_groupG_grpc_BooleanMessage_descriptor,
         new java.lang.String[] { "Value", });
     internal_static_pt_groupG_grpc_EmptyMessage_descriptor =
-      getDescriptor().getMessageTypes().get(2);
+      getDescriptor().getMessageTypes().get(4);
     internal_static_pt_groupG_grpc_EmptyMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_pt_groupG_grpc_EmptyMessage_descriptor,
         new java.lang.String[] { });
     internal_static_pt_groupG_grpc_NodeDetailsMessage_descriptor =
-      getDescriptor().getMessageTypes().get(3);
+      getDescriptor().getMessageTypes().get(5);
     internal_static_pt_groupG_grpc_NodeDetailsMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_pt_groupG_grpc_NodeDetailsMessage_descriptor,
         new java.lang.String[] { "Address", "Port", "Nodeid", "Bootstrapnodeid", });
     internal_static_pt_groupG_grpc_NodeDetailsListMessage_descriptor =
-      getDescriptor().getMessageTypes().get(4);
+      getDescriptor().getMessageTypes().get(6);
     internal_static_pt_groupG_grpc_NodeDetailsListMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_pt_groupG_grpc_NodeDetailsListMessage_descriptor,
         new java.lang.String[] { "Nodes", });
     internal_static_pt_groupG_grpc_NodeIdMessage_descriptor =
-      getDescriptor().getMessageTypes().get(5);
+      getDescriptor().getMessageTypes().get(7);
     internal_static_pt_groupG_grpc_NodeIdMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_pt_groupG_grpc_NodeIdMessage_descriptor,
         new java.lang.String[] { "Nodeid", "Bootstrapnodeid", });
     internal_static_pt_groupG_grpc_NodeIdListMessage_descriptor =
-      getDescriptor().getMessageTypes().get(6);
+      getDescriptor().getMessageTypes().get(8);
     internal_static_pt_groupG_grpc_NodeIdListMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_pt_groupG_grpc_NodeIdListMessage_descriptor,

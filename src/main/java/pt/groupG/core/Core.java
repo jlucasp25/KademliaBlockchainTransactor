@@ -3,10 +3,8 @@ package pt.groupG.core;
 import Utils.HashCash;
 import com.google.protobuf.ByteString;
 import pt.groupG.core.blockchain.Block;
-import pt.groupG.grpc.JoinMessage;
-import pt.groupG.grpc.NodeDetailsListMessage;
-import pt.groupG.grpc.NodeDetailsMessage;
-import pt.groupG.grpc.NodeIdMessage;
+import pt.groupG.core.blockchain.Blockchain;
+import pt.groupG.grpc.*;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -33,10 +31,12 @@ public class Core {
     // Kademlia Properties
     public static RoutingTable routingTable = null;
     public static Node selfNode;
+    public static ByteString bootstrapId;
 
     // Blockchain Properties
-    public static List<Block> blockchain = new LinkedList<Block>();
+    public static Blockchain blockchain = new Blockchain();
     public static List<String> trans = new LinkedList<String>();
+    public static PowExecutable pow = null;
 
 
     public static void main(String[] args) {
@@ -100,6 +100,7 @@ public class Core {
         NodeIdMessage joinRes = rpc.JOIN(joinReq);
         ByteString bootstrapNodeKey = joinRes.getBootstrapnodeidBytes();
         ByteString regularNodeKey = joinRes.getNodeidBytes();
+        bootstrapId = bootstrapNodeKey;
         System.out.println("[My Key] 0x" + new KademliaKey(regularNodeKey).toHexaString());
 
         // Checks if the initial work is valid.
@@ -116,7 +117,7 @@ public class Core {
 
         // start regular node connection channel
         // KademliaClientChannelRPC extends Thread therefore runs in parallel
-        clientRPC = new KademliaClientChannelRPC(SERVER_ADDRESS, CLIENT_PORT, routingTable, selfNode);
+        clientRPC = new KademliaClientChannelRPC(SERVER_ADDRESS, CLIENT_PORT, routingTable, selfNode, blockchain);
         clientRPC.start();
 
         // adds the bootstrap node to its routing table.
@@ -175,6 +176,8 @@ public class Core {
             // lets remove the current node from the list.
             totalNearNodes.remove(nearNode);
         }
+        pow = new PowExecutable(trans, selfNode, bootstrapId, routingTable, blockchain);
+        pow.start();
         Menu();
     }
 
@@ -183,9 +186,11 @@ public class Core {
      */
     public static void setupNodeAsBootstrap() {
         generateBootstrapNode(SERVER_ADDRESS, SERVER_PORT);
+        bootstrapId = ByteString.copyFrom(selfNode.nodeID.byteKey);
         routingTable = new RoutingTable(selfNode);
         serverRPC = new KademliaBootstrapChannelRPC(SERVER_ADDRESS, SERVER_PORT, routingTable, selfNode);
         serverRPC.start();
+        Menu();
     }
 
     /**
@@ -233,7 +238,7 @@ public class Core {
                 listTransactions();
                 break;
             case 5:
-                break;
+                System.exit(0);
             default:
                 System.out.println("Insert an available choice");
         }
@@ -253,6 +258,7 @@ public class Core {
 
     public static void newTransaction() {
         Scanner stdin = new Scanner(System.in);
+        int flag = 1;
         System.out.println("List of your contacts: ");
         List<Contact> allContacts = routingTable.getAllContacts();
         for (Contact aux : allContacts) {
@@ -265,15 +271,22 @@ public class Core {
         else {
             System.out.println("Insert the destination of your transaction: ");
             String dest = stdin.next();
+            System.out.println(dest);
             for (Contact aux : allContacts) {
-                if (aux.nodeID.toHexaString().equals(new KademliaKey(dest).toHexaString())) {
-                    trans.add("[New Transaction] " + amount + "$ sent to 0x" + dest.nodeID.toHexaString());
+                if (aux.nodeID.toHexaString().equals(dest)) {
+                    trans.add("[New Transaction] " + amount + "$ sent to 0x" + dest);
                     System.out.println("Transaction was made successfully");
                     //increase recipient's wallet
-                    destination.setWallet(destination.getWallet()+amount);
+                    KademliaClientRPC rpc = new KademliaClientRPC(aux.getAddress(), aux.getPort());
+                    MoneyMessage req = MoneyMessage.newBuilder().setValue(amount).build();
+                    EmptyMessage res = rpc.PAY(req);
                     //decrease sender's wallet
                     selfNode.setWallet(selfNode.getWallet()-amount);
+                    flag = 0;
                 }
+            }
+            if (flag == 1){
+                System.out.println("Insert an available recipient.");
             }
         }
         Menu();
@@ -292,29 +305,4 @@ public class Core {
         Menu();
     }
 
-
-/*    private static void createBlockPow() {
-        while(true) {
-            try {
-                String cash = HashCash.mintCash(UUID.randomUUID().toString(), 28).toString();
-                Block newBlock = new Block(trans);
-                trans.clear();
-
-                // Get the K closest nodes to the block's ID.
-                int index = calculateKBucket(newBlock.getBlockID());
-                LinkedList<NodeInfo> closestNodes = getClosestNodes(newBlock.getBlockID(), index);
-
-                blockchain.add(newBlock);
-                System.out.println("Blocks in the chain: " + blockchain.size());
-                performStoreRequest(newBlock, closestNodes, cash);
-
-                trans.add("I gossiped the block!");
-                TimeUnit.SECONDS.sleep(10);
-            } catch (NoSuchAlgorithmException | InterruptedException e) {
-                System.out.println("[Regular Node] Error during POW. ");
-                return;
-            }
-        }
-
-    }*/
 }

@@ -7,7 +7,19 @@ service ServerService {
   rpc join (JoinMessage) returns (NodeIdMessage);
   rpc ping (EmptyMessage) returns (BooleanMessage);
   rpc findNode (NodeDetailsMessage) returns (NodeDetailsListMessage);
+  rpc store (StoreMessage) returns (EmptyMessage);
   rpc findValue (NodeDetailsMessage) returns (NodeDetailsListMessage);
+  rpc pay (MoneyMessage) returns (EmptyMessage);
+}
+
+message StoreMessage {
+  string id = 1;
+  repeated string transaction = 2;
+  string cash = 3;
+}
+
+message MoneyMessage {
+  int32 value = 1;
 }
 
 message JoinMessage {

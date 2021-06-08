@@ -4,6 +4,8 @@ import com.google.protobuf.ByteString;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
+import org.bouncycastle.util.Store;
+import pt.groupG.core.blockchain.Blockchain;
 import pt.groupG.grpc.*;
 
 import java.io.IOException;
@@ -19,12 +21,14 @@ public class KademliaClientChannelRPC extends Thread {
     private String serverHost = "localhost";
     RoutingTable selfTable = null;
     Node selfNode = null;
+    Blockchain selfBlockchain = null;
 
-    public KademliaClientChannelRPC(String host, int port, RoutingTable table, Node nd) {
+    public KademliaClientChannelRPC(String host, int port, RoutingTable table, Node nd, Blockchain bc) {
         this.serverHost = host;
         this.serverPort = port;
         this.selfTable = table;
         this.selfNode = nd;
+        this.selfBlockchain = bc;
     }
 
     public void run() {
@@ -99,8 +103,18 @@ public class KademliaClientChannelRPC extends Thread {
             res.onCompleted();
         }
 
-        public void store() {
+        public void pay(MoneyMessage req, StreamObserver<EmptyMessage> res) {
+            System.out.println("[ClientService] Received PAY");
+            int amount = req.getValue();
+            selfNode.setWallet(selfNode.getWallet()+amount);
+            res.onNext(EmptyMessage.newBuilder().build());
+            res.onCompleted();
+        }
 
+        public void store(StoreMessage req, StreamObserver<EmptyMessage> res) {
+            System.out.println("[ClientService] Received STORE");
+            res.onNext(EmptyMessage.newBuilder().build());
+            res.onCompleted();
         }
     }
 

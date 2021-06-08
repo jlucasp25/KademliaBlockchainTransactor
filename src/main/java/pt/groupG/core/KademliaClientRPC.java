@@ -59,10 +59,10 @@ public class KademliaClientRPC {
         return res;
     }
 
-    public BooleanMessage STORE(NodeIdMessage req) {
-        BooleanMessage res = null;
-        // res = stub.store(req);
-        /*placeholder*/
+    public EmptyMessage STORE(StoreMessage req) {
+        EmptyMessage res = null;
+        System.out.println("[Client RPC]: Sent STORE");
+        res = stub.store(req);
         return res;
     }
 
@@ -71,6 +71,13 @@ public class KademliaClientRPC {
         res = stub.findValue(req);
         /*placeholder*/
         return new LinkedList<Node>();
+    }
+
+    public EmptyMessage PAY(MoneyMessage req) {
+        System.out.println("[Client RPC]: Sent PAY");
+        EmptyMessage res = null;
+        res = this.stub.pay(req);
+        return res;
     }
 
 }

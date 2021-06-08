@@ -133,6 +133,14 @@ public class KademliaBootstrapChannelRPC extends Thread {
             res.onNext(msg);
             res.onCompleted();
         }
+
+        public void pay(MoneyMessage req, StreamObserver<EmptyMessage> res) {
+            System.out.println("[ClientService] Received PAY");
+            int amount = req.getValue();
+            selfNode.setWallet(selfNode.getWallet()+amount);
+            res.onNext(EmptyMessage.newBuilder().build());
+            res.onCompleted();
+        }
     }
 
 }
