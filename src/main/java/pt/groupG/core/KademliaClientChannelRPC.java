@@ -78,6 +78,7 @@ public class KademliaClientChannelRPC extends Thread {
             System.out.println("[ClientService] Received PING");
             res.onNext(BooleanMessage.newBuilder().setValue(true).build());
             res.onCompleted();
+            Core.Menu();
         }
 
         /**
@@ -102,6 +103,7 @@ public class KademliaClientChannelRPC extends Thread {
             NodeDetailsListMessage msg = NodeDetailsListMessage.newBuilder().addAllNodes(nodes).build();
             res.onNext(msg);
             res.onCompleted();
+            Core.Menu();
         }
 
         public void pay(MoneyMessage req, StreamObserver<EmptyMessage> res) {
@@ -110,6 +112,7 @@ public class KademliaClientChannelRPC extends Thread {
             selfNode.setWallet(selfNode.getWallet()+amount);
             res.onNext(EmptyMessage.newBuilder().build());
             res.onCompleted();
+            Core.Menu();
         }
 
         public void store(StoreMessage req, StreamObserver<EmptyMessage> res) {
@@ -119,6 +122,7 @@ public class KademliaClientChannelRPC extends Thread {
             System.out.println("[ClientService] Blockchain is now with " + Blockchain.blocks.size() + " blocks.");
             res.onNext(EmptyMessage.newBuilder().build());
             res.onCompleted();
+            Core.Menu();
         }
     }
 

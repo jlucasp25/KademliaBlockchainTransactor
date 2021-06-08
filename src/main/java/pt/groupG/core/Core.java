@@ -47,9 +47,8 @@ public class Core {
             // send initialWork to bootstrap node for validation
             // only after this validation, can the node join the network
             setupNodeAsRegular();
-        } else if (s.equals("2")) {
-            // TODO
-            // o bootstrap node tem de ser sempre o mesmo, passar a estatico.
+        }
+        else if (s.equals("2")) {
             setupNodeAsBootstrap();
         } else {
             System.out.println("Wrong Option! Exiting.");
@@ -101,11 +100,13 @@ public class Core {
         ByteString regularNodeKey = joinRes.getNodeidBytes();
         pt.groupG.grpc.Blockchain bc = joinRes.getBlockchain();
         setBlockchain(bc);
+
         try {
             rpc.terminateConnection();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
         bootstrapId = bootstrapNodeKey;
         System.out.println("[My Key] 0x" + new KademliaKey(regularNodeKey).toHexaString());
 
@@ -193,13 +194,13 @@ public class Core {
             // lets remove the current node from the list.
             totalNearNodes.remove(nearNode);
         }
-        pow = new PowExecutable(/*trans,*/ selfNode, bootstrapId/*, routingTable, blockchain*/);
+        pow = new PowExecutable(selfNode, bootstrapId);
         pow.start();
         Menu();
     }
 
     /**
-     *
+     * Transforms blockchain
      */
     public static void setBlockchain(pt.groupG.grpc.Blockchain bc) {
         for (BlockData aux : bc.getBlockList()) {
@@ -208,7 +209,6 @@ public class Core {
             blockchain.newBlock(block);
         }
     }
-
 
     /**
      * Setups the Node as a bootstrap/master Peer.
@@ -322,7 +322,6 @@ public class Core {
                 System.out.println("Insert an available recipient.");
             }
         }
-        Menu();
     }
 
     public static void listTransactions() {

@@ -63,13 +63,13 @@ public class KademliaClientRPC {
         EmptyMessage res = null;
         System.out.println("[Client RPC]: Sent STORE");
         res = stub.store(req);
+        Core.Menu();
         return res;
     }
 
     public List<Node> FIND_VALUE(NodeDetailsMessage req) {
         NodeDetailsListMessage res = null;
         res = stub.findValue(req);
-        /*placeholder*/
         return new LinkedList<Node>();
     }
 

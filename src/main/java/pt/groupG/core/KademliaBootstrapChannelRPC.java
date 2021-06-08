@@ -80,6 +80,7 @@ public class KademliaBootstrapChannelRPC extends Thread {
             System.out.println("[BootstrapService] Received PING");
             res.onNext(BooleanMessage.newBuilder().setValue(true).build());
             res.onCompleted();
+            Core.Menu();
         }
 
         /**
@@ -97,6 +98,7 @@ public class KademliaBootstrapChannelRPC extends Thread {
                 System.out.println("[BootstrapService] Generated Invalid Initial Work! (Sending empty message)");
                 res.onNext(NodeIdMessage.newBuilder().build());
                 res.onCompleted();
+                Core.Menu();
                 return;
             }
 
@@ -123,6 +125,7 @@ public class KademliaBootstrapChannelRPC extends Thread {
 
             res.onNext(msg);
             res.onCompleted();
+            Core.Menu();
         }
         /**
          * FIND-NODE RPC Response Handler
@@ -162,9 +165,13 @@ public class KademliaBootstrapChannelRPC extends Thread {
             System.out.println("[BootstrapService] Received STORE");
             Block block = new Block(req.getTransactionList());
             Core.blockchain.newBlock(block);
-            System.out.println("[BootstrapService] Blockchain is now with " + Blockchain.blocks.size() + " blocks.");
+            if(Blockchain.blocks.size() == 1 )
+                System.out.println("[BootstrapService] Blockchain is now with 1 block.");
+            else
+                System.out.println("[BootstrapService] Blockchain is now with " + Blockchain.blocks.size() + " blocks.");
             res.onNext(EmptyMessage.newBuilder().build());
             res.onCompleted();
+            Core.Menu();
         }
     }
 

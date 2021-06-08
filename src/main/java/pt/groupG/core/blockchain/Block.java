@@ -14,7 +14,6 @@ import java.util.logging.Logger;
 public class Block {
     public String hash;
     public String previousHash;
-    public String merkleTree;
     private long timeStamp; //timestamp of the creation of this block
     private int nonce;
 
@@ -80,7 +79,7 @@ public class Block {
     }
 
     public void addTransaction(String newtrans) {
-        //ver se a hash anterior corresponde
+        //see if
         if (Blockchain.HashValidator()) {
             trans.add(newtrans);
             System.out.println("New Transaction added to Block.");
