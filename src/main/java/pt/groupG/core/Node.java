@@ -11,6 +11,7 @@ public class Node {
     public KademliaKey nodeID;
     private String address;
     private int port;
+    private int wallet = 0;
 
     public String getAddress() {
         return address;
@@ -23,6 +24,10 @@ public class Node {
     public int getPort() {
         return port;
     }
+
+    public void setWallet(int wallet) { this.wallet = wallet; }
+
+    public int getWallet() { return wallet; }
 
     /**
      * Calls calculate distance to determine position on the kademlia tree.

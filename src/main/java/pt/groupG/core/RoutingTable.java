@@ -46,6 +46,16 @@ public class RoutingTable {
         correspondingBucket.addNode(aux);
     }
 
+    public List<Contact> getAllContacts() {
+        List<Contact> allContacts = new LinkedList<>();
+        for (KBucket aux : this.buckets) {
+            if(!aux.isEmpty()) {
+               allContacts.addAll(aux.contacts);
+            }
+        }
+        return allContacts;
+    }
+
     public String toString() {
         String total = "";
         for (KBucket aux : this.buckets) {

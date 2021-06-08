@@ -10,6 +10,7 @@ import pt.groupG.grpc.NodeIdMessage;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static Utils.StringUtils.generateRandomString;
 
@@ -35,6 +36,7 @@ public class Core {
 
     // Blockchain Properties
     public static List<Block> blockchain = new LinkedList<Block>();
+    public static List<String> trans = new LinkedList<String>();
 
 
     public static void main(String[] args) {
@@ -69,6 +71,7 @@ public class Core {
      * To prevent Sybil Attack
      */
     public static String sybilAttackPrevention() throws NoSuchAlgorithmException {
+
         return HashCash.mintCash(generateRandomString(), 10).toString();
     }
 
@@ -83,6 +86,7 @@ public class Core {
         String initialWork = null;
         try {
             initialWork = sybilAttackPrevention();
+            initialWork = initialWork.replace(',','c');
         } catch (NoSuchAlgorithmException e) {
             System.out.println("[Regular Node #NONE] Initial Work failed. Exiting!");
             return;
@@ -118,7 +122,7 @@ public class Core {
         // adds the bootstrap node to its routing table.
         routingTable.addNode(new Node(new KademliaKey(bootstrapNodeKey), SERVER_ADDRESS, SERVER_PORT));
 
-
+        //createBlockPow();
 
         // send a FIND_NODE request to the bootstrap node
         // so that it finds the closest 3 nodes to itself.
@@ -170,9 +174,8 @@ public class Core {
             }
             // lets remove the current node from the list.
             totalNearNodes.remove(nearNode);
-
         }
-
+        Menu();
     }
 
     /**
@@ -203,4 +206,115 @@ public class Core {
         return Integer.parseInt(stdin.next());
     }
 
+    public static void Menu() {
+        Scanner stdin = new Scanner(System.in);
+        System.out.println();
+        System.out.println("      MENU SELECTION     ");
+        System.out.println("Choose from these choices");
+        System.out.println("-------------------------");
+        System.out.println("1 - Add money to your wallet");
+        System.out.println("2 - Total of your wallet");
+        System.out.println("3 - Make a transaction");
+        System.out.println("4 - Total of your transactions");
+        System.out.println("5 - Quit");
+        int choice = Integer.parseInt(stdin.next());
+
+        switch (choice) {
+            case 1:
+                addMoneyWallet();
+                break;
+            case 2:
+                getMoneyWallet();
+                break;
+            case 3:
+                newTransaction();
+                break;
+            case 4:
+                listTransactions();
+                break;
+            case 5:
+                break;
+            default:
+                System.out.println("Insert an available choice");
+        }
+    }
+
+    public static void addMoneyWallet() {
+        Scanner stdin = new Scanner(System.in);
+        System.out.println("Insert your amount: ");
+        selfNode.setWallet(Integer.parseInt(stdin.next()));
+        Menu();
+    }
+
+    public static void getMoneyWallet() {
+        System.out.println("Total of your wallet: " + selfNode.getWallet()+"$");
+        Menu();
+    }
+
+    public static void newTransaction() {
+        Scanner stdin = new Scanner(System.in);
+        System.out.println("List of your contacts: ");
+        List<Contact> allContacts = routingTable.getAllContacts();
+        for (Contact aux : allContacts) {
+            System.out.println("Contact: " + aux);
+        }
+        System.out.println("Insert the amount of transaction: ");
+        int amount = Integer.parseInt(stdin.next());
+        if (amount > selfNode.getWallet())
+            System.out.println("You don't have enough money in your wallet to do the transaction");
+        else {
+            System.out.println("Insert the destination of your transaction: ");
+            String dest = stdin.next();
+            for (Contact aux : allContacts) {
+                if (aux.nodeID.toHexaString().equals(new KademliaKey(dest).toHexaString())) {
+                    trans.add("[New Transaction] " + amount + "$ sent to 0x" + dest.nodeID.toHexaString());
+                    System.out.println("Transaction was made successfully");
+                    //increase recipient's wallet
+                    destination.setWallet(destination.getWallet()+amount);
+                    //decrease sender's wallet
+                    selfNode.setWallet(selfNode.getWallet()-amount);
+                }
+            }
+        }
+        Menu();
+    }
+
+    public static void listTransactions() {
+        if (trans.size()==0) {
+            System.out.println("You have not made any transaction!");
+        }
+        else {
+            System.out.println("List of your transactions: ");
+            for (String aux : trans) {
+                System.out.println("[Transaction] " + aux);
+            }
+        }
+        Menu();
+    }
+
+
+/*    private static void createBlockPow() {
+        while(true) {
+            try {
+                String cash = HashCash.mintCash(UUID.randomUUID().toString(), 28).toString();
+                Block newBlock = new Block(trans);
+                trans.clear();
+
+                // Get the K closest nodes to the block's ID.
+                int index = calculateKBucket(newBlock.getBlockID());
+                LinkedList<NodeInfo> closestNodes = getClosestNodes(newBlock.getBlockID(), index);
+
+                blockchain.add(newBlock);
+                System.out.println("Blocks in the chain: " + blockchain.size());
+                performStoreRequest(newBlock, closestNodes, cash);
+
+                trans.add("I gossiped the block!");
+                TimeUnit.SECONDS.sleep(10);
+            } catch (NoSuchAlgorithmException | InterruptedException e) {
+                System.out.println("[Regular Node] Error during POW. ");
+                return;
+            }
+        }
+
+    }*/
 }

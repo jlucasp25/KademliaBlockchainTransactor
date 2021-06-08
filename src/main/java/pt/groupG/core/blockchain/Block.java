@@ -31,6 +31,10 @@ public class Block {
             this.nonce = nonce;
         }
 
+        public Block (List<String> trans) {
+            this.trans = trans;
+        }
+
         public void mineBlock(int dif) {
             // merkleTree = getMerleRoot(ver funçao)
             String prefixString = new String(new char[dif]).replace('\0', '0');
