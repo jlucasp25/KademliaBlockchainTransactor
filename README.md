@@ -1,9 +1,7 @@
 # Kademlia Blockchain Transactor
 
-## Final Project for Software & Data Security class
+Final project for Software and Data Security class.
 
-------
+This is a Java implementation of the Kademlia protocol together with a Blockchain generator.
 
-Java Implementation of a Kademlia protocol together with a Blockchain generator.
-
-Uses the Protobuf protocol for communication.
+It uses the Protobug protocol for communication.
